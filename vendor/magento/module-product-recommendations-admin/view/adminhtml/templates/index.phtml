@@ -1,0 +1,19 @@
+<?php
+
+/** @var \Magento\ProductRecommendationsAdmin\Block\Adminhtml\Index $block */ ?>
+
+<div
+    data-api-key="<?= $block->escapeHtmlAttr($block->getApiKey()); ?>"
+    data-environment-id="<?= $block->escapeHtmlAttr($block->getEnvironmentId()); ?>"
+    data-environment-name="<?= $block->escapeHtmlAttr($block->getEnvironmentName()); ?>"
+    data-environment-type="<?= $block->escapeHtmlAttr($block->getEnvironmentType()); ?>"
+    data-alternate-environment="<?= $block->escapeHtmlAttr($block->getAlternateEnvironmentId()); ?>"
+    data-is-alternate-environment-enabled="<?= $block->escapeHtmlAttr(json_encode($block->isAlternateEnvironmentEnabled())); ?>"
+    data-store-view-code="<?= $block->escapeHtmlAttr($block->getStoreViewCode()); ?>"
+    data-magento-middleware-url="<?= $block->escapeUrl($block->getUrl('product_recommendations/index/middleware')); ?>"
+    data-config-page-url="<?= $block->escapeUrl($block->getUrl('adminhtml/system_config/edit/section/services_connector')); ?>"
+    data-store-currency-code="<?= $block->getBaseCurrencyCode(); ?>"
+    id="root"
+></div>
+
+<script src="<?= $block->escapeUrl($block->getFrontendUrl()) ?>"></script>

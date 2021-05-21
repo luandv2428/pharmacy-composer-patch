@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<?php
+/** @var \Magento\DataServices\Block\Context $block */
+/** @var \Magento\DataServices\ViewModel\WishListProvider $viewModel */
+$viewModel = $block->getViewModel();
+$userAction = $viewModel->getUserAction();
+$pageAction = $userAction ? $userAction : $block->getData('step_name');
+?>
+
+<script>
+    window.dsDataLayer.page = {
+        pageType: "<?= /* @noEscape */ $block->getData('page_type'); ?>",
+        action: "<?= /* @noEscape */ $pageAction; ?>"
+    };
+    window.dsDataLayer.cart = {
+        cartId: <?= /* @noEscape */ $block->getCartId(); ?>
+    };
+    window.dsDataLayer.wishlist = <?= /* @noEscape */ $block->getEventContext(); ?>;
+</script>

@@ -1,0 +1,26 @@
+{
+    "name": "magento/module-product-recommendations-layout",
+    "description": "Product Recommendations storefront layout.",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": ">=7.1.3 <7.5.0",
+        "magento/framework": ">=102.0.0 <104.0.0",
+        "magento/module-catalog": ">=103.0.0 <105.0.0",
+        "magento/module-store": ">=101.0.0 <101.2.0",
+        "magento/data-services": "~5.0",
+        "magento/module-product-recommendations-admin": "~2.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magento\\ProductRecommendationsLayout\\": ""
+        }
+    },
+    "version": "3.0.3"
+}

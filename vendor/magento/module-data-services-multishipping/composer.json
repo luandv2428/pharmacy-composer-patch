@@ -1,0 +1,28 @@
+{
+    "name": "magento/module-data-services-multishipping",
+    "description": "Data Services Multishipping module",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.1.3 <7.5.0",
+        "magento/framework": ">102.0.0",
+        "magento/module-customer": ">=102.0.0 <104.0.0",
+        "magento/module-multishipping": ">=100.3.0 <100.5.0",
+        "magento/module-data-services": "~5.0"
+    },
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magento\\DataServicesMultishipping\\": ""
+        }
+    },
+    "version": "5.0.1"
+}

@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /* @var $block \Magento\ServicesId\Block\Adminhtml\System\Config\SelectProject */ ?>
+
+<?php echo $block->getSelectHtml(); ?>
+<br />
+<?php if ($block->getErrorMessage()): ?>
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/alert',
+        'prototype'
+    ], function($, modalAlert) {
+        modalAlert({
+            title: $.mage.__('Error'),
+            content: '<?= /* @escapeNotVerified */ $block->getErrorMessage() ?>',
+            clickableOverlay: false,
+            actions: {
+                always: function () {
+                }
+            },
+            buttons: [
+                {
+                    text: $.mage.__('Close'),
+                    class: 'action-primary',
+                    click: function () {
+                        this.closeModal(true);
+                    }
+                }
+            ]
+        });
+    });
+</script>
+<?php endif; ?>
+<?php if (!$block->isSaveRequired()): ?>
+    <?php echo $block->getButtonHtml(); ?>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function($){
+        let projectList = $('#services_connector_services_id_project_id');
+        let projectId = projectList.val();
+        if (projectId) {
+            projectList.after(`<p class="note"><span id="project_note">Project ID: ${projectId}</span></p>`);
+            let projectListSelected = $('#services_connector_services_id_project_id option:selected');
+            let projectNameInput = $('#services_connector_services_id_saas_project_project_name');
+            projectNameInput.val(projectListSelected.text());
+
+            projectList.change(function() {
+                $('#project_note').text(`Project ID: ${$(this).val()}`);
+                projectNameInput.val($('option:selected', $(this)).text());
+            });
+        }
+
+        $('#services_connector_services_id_saas_project-head').hide();
+        $('#row_services_connector_services_id_saas_project td div').css('border-bottom', 'none');
+        $('#create_project_button').click(function () {
+            $('#create_project_button').hide();
+            $('#services_connector_services_id_saas_project').show();
+        });
+    });
+</script>

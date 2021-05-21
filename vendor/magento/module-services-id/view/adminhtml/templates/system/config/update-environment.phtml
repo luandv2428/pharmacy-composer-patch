@@ -1,0 +1,84 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /* @var $block \Magento\ServicesId\Block\Adminhtml\System\Config\UpdateEnvironment */ ?>
+
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/alert',
+        'prototype'
+    ], function($, modalAlert){
+
+        let requestEnvironmentSpan = $('#update_environment_span');
+
+        $('#cancel_environment_button').click(function () {
+            $('#services_connector_services_id_saas_environment').hide();
+            $('#rename_environment_button').show();
+        });
+
+        $('#update_environment_button').click(function () {
+            let environmentName = $('#services_connector_services_id_saas_environment_environment_name').val();
+            let environmentId = $('#services_connector_services_id_environment_id').val();
+            let params = {
+                'method': 'PATCH',
+                'uri': `registry/environments/${environmentId}`,
+                'environmentName': environmentName
+            };
+            new Ajax.Request('<?= $block->escapeUrl($block->getEnvironmentUrl()) ?>', {
+                parameters:     params,
+                loaderArea:     false,
+                asynchronous:   true,
+                onCreate: function() {
+                    requestEnvironmentSpan.find('.environment_updated').hide();
+                    requestEnvironmentSpan.find('.error').hide();
+                    requestEnvironmentSpan.find('.processing').show();
+                    $('#update_environment_message_span').text('');
+                },
+                onSuccess: function(response) {
+                    requestEnvironmentSpan.find('.processing').hide();
+
+                    var resultText = '';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                        showErrorAlert(resultText);
+                    } else if (response.responseJSON !== null
+                        && response.status === 200
+                        && !response.responseJSON.message
+                    ) {
+                        resultText = '<?= /* @escapeNotVerified */ __("Success. Saving and reloading page...") ?>';
+                        requestEnvironmentSpan.find('.environment_updated').show();
+                        location.reload();
+                    } else {
+                        resultText = '<?= /* @escapeNotVerified */ __("An error occurred updating environment") ?>';
+                        requestEnvironmentSpan.find('.error').show();
+                        showErrorAlert(resultText);
+                    }
+                    $('#update_environment_message_span').text(resultText);
+                }
+            });
+
+            function showErrorAlert(content) {
+                modalAlert({
+                    title: 'Magento Services Error',
+                    content: content,
+                    clickableOverlay: false,
+                    actions: {
+                        always: function() {}
+                    }
+                })
+            }
+        });
+    });
+</script>
+
+<?php echo $block->getButtonHtml() ?>
+<span class="update_environment-indicator" id="update_environment_span">
+    <img class="processing" hidden="hidden" alt="Updating environment" style="margin:0 5px" src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
+    <img class="environment_updated" hidden="hidden" alt="Environment updated!" style="margin:-3px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
+    <img class="error" hidden="hidden" alt="Error" style="margin:-1px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_remove.gif') ?>"/>
+    <span id="update_environment_message_span"></span>
+</span>

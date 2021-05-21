@@ -1,0 +1,107 @@
+{
+  "name": "magento/ece-tools",
+  "description": "Provides tools to build and deploy Magento 2 Enterprise Edition",
+  "type": "magento2-component",
+  "version": "2002.1.6",
+  "license": "OSL-3.0",
+  "repositories": {
+    "repo.magento.com": {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  },
+  "require": {
+    "php": "^7.1.3",
+    "ext-PDO": "*",
+    "ext-json": "*",
+    "ext-sockets": "*",
+    "colinmollenhour/credis": "^1.6.0",
+    "composer/composer": "^1.4",
+    "composer/semver": "^1.4",
+    "graylog2/gelf-php": "^1.4.2",
+    "guzzlehttp/guzzle": "^6.2",
+    "illuminate/config": "^5.5",
+    "magento/magento-cloud-components": "^1.0.6",
+    "magento/magento-cloud-docker": "^1.0.0",
+    "magento/magento-cloud-patches": "^1.0.6",
+    "magento/quality-patches": "^1.0.3",
+    "monolog/monolog": "^1.16",
+    "nesbot/carbon": "^1.0||^2.0",
+    "psr/container": "^1.0",
+    "psr/log": "^1.0",
+    "symfony/config": "^4.4",
+    "symfony/console": "^2.8||^4.0",
+    "symfony/dependency-injection": "^3.3||^4.3",
+    "symfony/process": "^2.1||^4.1",
+    "symfony/serializer": "^2.8||^3.3||^4.0",
+    "symfony/yaml": "^3.3||^4.0"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.5.3",
+    "consolidation/robo": "^1.2",
+    "php-mock/php-mock-phpunit": "^2.0",
+    "phpmd/phpmd": "@stable",
+    "phpstan/phpstan": "^0.12",
+    "phpunit/php-code-coverage": "^6.0",
+    "phpunit/phpunit": "^7.2",
+    "squizlabs/php_codesniffer": "^3.0",
+    "funkjedi/composer-include-files": "^1.0"
+  },
+  "conflict": {
+    "nesbot/carbon": ">=1.38 <2.0"
+  },
+  "replace": {
+    "magento/ece-patches": "*",
+    "magento/magento-cloud-configuration": "*"
+  },
+  "bin": [
+    "bin/ece-tools"
+  ],
+  "autoload": {
+    "psr-4": {
+      "Magento\\MagentoCloud\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Magento\\MagentoCloud\\Test\\": "tests/static/",
+      "Magento\\MagentoCloud\\Test\\Integration\\": "tests/integration/",
+      "Magento\\MagentoCloud\\Test\\Functional\\": "tests/functional/"
+    }
+  },
+  "scripts": {
+    "test:all": [
+      "@test:phpstan",
+      "@test:phpcs",
+      "@test:phpmd",
+      "@test:unit",
+      "@test:integration",
+      "@test:coverage"
+    ],
+    "test:phpstan": "phpstan analyse -c tests/static/phpstan.neon",
+    "test:phpcs": "phpcs src --standard=tests/static/phpcs-ruleset.xml -p -n",
+    "test:phpmd": "phpmd src xml tests/static/phpmd-ruleset.xml",
+    "test:unit": "phpunit --configuration tests/unit",
+    "test:integration": "phpunit --configuration tests/integration",
+    "test:coverage": "phpunit --configuration tests/unit --coverage-clover tests/unit/tmp/clover.xml && php tests/unit/code-coverage.php tests/unit/tmp/clover.xml",
+    "test:coverage-generate": "phpunit --configuration tests/unit --coverage-html tests/unit/tmp/coverage",
+    "pre-autoload-dump": [
+      "Magento\\MagentoCloud\\Composer\\ClearAutoload::preAutoloadDump"
+    ]
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "prefer-stable": true,
+  "extra": {
+    "map": [
+      [
+        "dist/.magento.env.yaml",
+        ".magento.env.yaml.dist"
+      ]
+    ],
+    "include_files": [
+      "vendor/codeception/phpunit-wrapper/src/phpunit7-interfaces.php"
+    ]
+  }
+}

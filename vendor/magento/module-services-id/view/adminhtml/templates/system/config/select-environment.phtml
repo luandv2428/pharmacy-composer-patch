@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /* @var $block \Magento\ServicesId\Block\Adminhtml\System\Config\SelectEnvironment */ ?>
+
+<?php echo $block->getSelectHtml(); ?>
+<br />
+<?php if ($block->shouldRenderButton()): ?>
+    <?php echo $block->getButtonHtml(); ?>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function($){
+        let environmentNameRegex = '^(.+?)\\[Type:';
+        let environmentTypeRegex = '\\[Type: (.*?)\\]';
+        let environmentList = $('#services_connector_services_id_environment_id');
+        let environmentListSelected = $('#services_connector_services_id_environment_id option:selected');
+        let environmentId = environmentList.val();
+        let environmentName, environmentType;
+
+        $('#row_services_connector_services_id_saas_environment_environment').hide();
+        environmentList.after(`<p class="note"><span id="environment_note" style="display: none;">Environment ID: ${environmentId}</span></p>`);
+
+        if (environmentId) {
+            $('#environment_note').show();
+            environmentName = environmentListSelected.text().match(environmentNameRegex)[1].trim();
+            $('#services_connector_services_id_saas_environment_environment_name').val(environmentName);
+            environmentType = environmentListSelected.text().match(environmentTypeRegex)[1].trim();
+            $('#services_connector_services_id_saas_environment_environment').val(environmentType);
+        }
+
+        environmentList.change(function() {
+            $('#environment_note').show();
+            environmentListSelected = $('option:selected', $(this));
+            $('#environment_note').text(`Environment ID: ${$(this).val()}`);
+
+            environmentName = environmentListSelected.text().match(environmentNameRegex)[1].trim();
+            $('#services_connector_services_id_saas_environment_environment_name').val(environmentName);
+            environmentType = environmentListSelected.text().match(environmentTypeRegex)[1].trim();
+            $('#services_connector_services_id_saas_environment_environment').val(environmentType);
+        });
+
+        $('#services_connector_services_id_saas_environment-head').hide();
+        $('#rename_environment_button').click(function () {
+            $('#rename_environment_button').hide();
+            $('#services_connector_services_id_saas_environment').show();
+        });
+
+        let projectList = $('#services_connector_services_id_project_id');
+        const projectEnvironmentOptions = JSON.parse('<?= /* @escapeNotVerified */ json_encode($block->getProjectEnvironmentOptionsArray()) ?>');
+        projectList.change(function() {
+            let projectId = projectList.val();
+            environmentList.empty();
+            let projectEnvironments = projectEnvironmentOptions[projectId];
+            $.each(projectEnvironments, function(key, value) {
+                let option = $('<option></option>').val(value['value']).text(value['text']);
+                environmentList.append(option);
+            });
+            environmentListSelected = $('option:selected', environmentList);
+            $('#environment_note').text(`Environment ID: ${environmentListSelected.val()}`);
+        });
+    });
+</script>

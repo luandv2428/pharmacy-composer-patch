@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminDisplaySpecialCharsInProductNameTest">
+        <annotations>
+            <features value="Catalog"/>
+            <stories value="Special characters"/>
+            <title value="Displayig special characters in Product name"/>
+            <description value="Displayig special characters in Product name"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-16550"/>
+            <useCaseId value="MAGETWO-65232"/>
+            <group value="catalog"/>
+        </annotations>
+        <before>
+            <createData entity="Simple_US_CA_Customer" stepKey="createCustomer"/>
+            <createData entity="ApiCategory" stepKey="createCategory"/>
+            <createData entity="ApiSimpleProductWithSpecCharInName" stepKey="createProduct">
+                <requiredEntity createDataKey="createCategory"/>
+            </createData>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+        <after>
+            <deleteData createDataKey="createProduct" stepKey="deleteProduct"/>
+            <deleteData createDataKey="createCustomer" stepKey="deleteCustomer"/>
+            <deleteData createDataKey="createCategory" stepKey="deleteCategory"/>
+            <actionGroup ref="AdminOrdersGridClearFiltersActionGroup" stepKey="clearOrderGridFilters"/>
+            <actionGroup ref="ClearProductsFilterActionGroup" stepKey="clearProductsFilter"/>
+            <actionGroup ref="StagingDashboardClearFiltersActionGroup" stepKey="clearStagingFilters"/>
+            <actionGroup ref="clearInvoicesGridFilters" stepKey="clearInvoicesGridFilters"/>
+            <actionGroup ref="logout" stepKey="logoutFromAdmin"/>
+            <actionGroup ref="StorefrontCustomerLogoutActionGroup" stepKey="customerLogout"/>
+        </after>
+        <!--Go to products page-->
+        <amOnPage url="{{AdminCatalogProductPage.url}}" stepKey="navigateToProductsPage"/>
+        <actionGroup ref="filterProductGridBySku" stepKey="filterProductGridBySku">
+            <argument name="product" value="ApiSimpleProductWithSpecCharInName"/>
+        </actionGroup>
+        <!--Assert product name-->
+        <waitForElementVisible selector="{{AdminProductGridSection.firstProductRowName}}" stepKey="waitForProductFiltered"/>
+        <see selector="{{AdminProductGridSection.firstProductRowName}}" userInput="$createProduct.name$" stepKey="assertProductName"/>
+        <!--Go to created product page-->
+        <amOnPage url="{{AdminProductEditPage.url($createProduct.id$)}}" stepKey="navigateToProductPage"/>
+        <!--Assert product name-->
+        <waitForElementVisible selector="{{AdminHeaderSection.pageTitle}}" stepKey="waitForProductPageLoaded"/>
+        <see selector="{{AdminHeaderSection.pageTitle}}"  userInput="$createProduct.name$" stepKey="assertProductTitle"/>
+        <!--Click 'Schedule New Update' button-->
+        <click selector="{{AdminStagingSlideOutSection.scheduleNewUpdateBtn}}" stepKey="clickButtonScheduleNewUpdate"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <!--Fill in required fields and click 'Save' button-->
+        <generateDate date="+1 day" format="m/j/Y g:i A" stepKey="generateStartDate"/>
+        <generateDate date="+3 day" format="m/j/Y g:i A" stepKey="generateEndDate"/>
+        <actionGroup ref="FillScheduleUpdateWithCheckEndActionGroup" stepKey="createScheduleUpdate">
+            <argument name="staging" value="S5UpdateNameStaging"/>
+            <argument name="timeStart" value="{$generateStartDate}"/>
+            <argument name="timeEnd" value="{$generateEndDate}"/>
+        </actionGroup>
+        <!--Go to Content Staging Dashboard and enter staging update edit page-->
+        <actionGroup ref="navigateToViewStagingUpdateFromStagingDashboard" stepKey="navigateToViewStagingUpdateFromStagingDashboard">
+            <argument name="update" value="S5UpdateNameStaging"/>
+        </actionGroup>
+        <!--Expand 'Products' section-->
+        <click selector="{{AdminStagingEditSection.productsTab}}" stepKey="expandProductsSection"/>
+        <waitForPageLoad stepKey="waitForStagingUpdateEditPageLoad"/>
+        <!--Assert product name and SKU in the grid-->
+        <actionGroup ref="AssertAdminProductInStagingActionGroup" stepKey="assertProductNameAndSku">
+            <argument name="productName" value="$createProduct.name$"/>
+            <argument name="productSku" value="$createProduct.sku$"/>
+        </actionGroup>
+        <!--Go to Storefront as logged in Customer  -->
+        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="customerLogin">
+            <argument name="Customer" value="$createCustomer$" />
+        </actionGroup>
+        <!--Assert product name in Storefront category page-->
+        <amOnPage url="{{StorefrontCategoryPage.url($createCategory.custom_attributes[url_key]$)}}" stepKey="onCategoryPage"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.productName}}" stepKey="waitForProductLoaded"/>
+        <see selector="{{StorefrontCategoryMainSection.productName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnCategoryPage"/>
+        <!--Assert product name in Storefront product info section-->
+        <click selector="{{StorefrontCategoryMainSection.productLink}}" stepKey="openProductPageOnStorefront"/>
+        <waitForElementVisible selector="{{StorefrontProductInfoMainSection.productName}}" stepKey="waitProductPageOpened"/>
+        <see selector="{{StorefrontProductInfoMainSection.productName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnProductInfoPage"/>
+        <!--Assert product name from breadcrumbs-->
+        <see selector="{{StorefrontNavigationSection.categoryBreadcrumbsByNumber('3')}}" userInput="$createProduct.name$" stepKey="assertProductNameOnBreadcrumbs"/>
+        <!--Add the product to Wish List-->
+        <click selector="{{StorefrontProductPageSection.addToWishlist}}" stepKey="addProductToWishList"/>
+        <!--Assert product name in the page and notification-->
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitForSuccessMessage"/>
+        <see selector="{{StorefrontMessagesSection.success}}" userInput="$createProduct.name$ has been added to your Wish List." stepKey="assertSuccessMessage"/>
+        <waitForElementVisible selector="{{StorefrontCategoryMainSection.productName}}" stepKey="waitForProductLoadedOnWishListPage"/>
+        <see selector="{{StorefrontCategoryMainSection.productName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnWishListPage"/>
+        <!--Add the product to Cart-->
+        <moveMouseOver selector="{{StorefrontCategoryMainSection.ProductItemInfo}}" stepKey="hoverOverProduct"/>
+        <waitForElementVisible selector="{{StorefrontCatalogSearchMainSection.AddToCartBtn}}" stepKey="waitAddToCardButtonToBeVisible"/>
+        <click selector="{{StorefrontCatalogSearchMainSection.AddToCartBtn}}" stepKey="addSimpleProductToCart"/>
+        <waitForPageLoad stepKey="waifForProductAddedToCart"/>
+        <!--Assert product name in the notification-->
+        <waitForElementVisible selector="{{StorefrontMessagesSection.success}}" stepKey="waitSuccessMessageToBeVisible"/>
+        <see selector="{{StorefrontMessagesSection.success}}" userInput="You added $createProduct.name$ to your shopping cart." stepKey="assertAddedToCartSuccessMessage"/>
+        <!--Click on the Mini Cart-->
+        <waitForElementVisible selector="{{StorefrontMinicartSection.showCart}}" stepKey="waitForShowCartButtonVisible"/>
+        <click selector="{{StorefrontMinicartSection.showCart}}" stepKey="openMiniCart"/>
+        <waitForElementVisible selector="{{StorefrontMinicartSection.viewAndEditCart}}" stepKey="waitViewAndEditCartToBeVisible"/>
+        <!--Assert product name in the Mini Cart-->
+        <see selector="{{StorefrontMinicartSection.productName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnMiniCartPage"/>
+        <!--Click 'View and Edit Cart'-->
+        <click selector="{{StorefrontMinicartSection.viewAndEditCart}}" stepKey="clickViewAndEditCart"/>
+        <waitForPageLoad stepKey="waitForMiniCartPage"/>
+        <!--Assert product name on the Shopping Cart page-->
+        <waitForElementVisible selector="{{CheckoutCartProductSection.productName}}" stepKey="waitForProductOnCartPage"/>
+        <see selector="{{CheckoutCartProductSection.productName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnShoppingCartPage"/>
+        <!--Click 'Proceed to Checkout'-->
+        <click selector="{{CheckoutCartSummarySection.proceedToCheckout}}" stepKey="clickProceedToCheckout"/>
+        <waitForPageLoad stepKey="waitForCheckoutPage"/>
+        <!--Assert product name on the order summary block on checkout page-->
+        <waitForElementVisible selector="{{CheckoutOrderSummarySection.miniCartTab}}" stepKey="waitForMiniCartButton"/>
+        <click selector="{{CheckoutOrderSummarySection.miniCartTab}}" stepKey="clickToOpenOrderSummaryBlock"/>
+        <waitForPageLoad stepKey="waitSummaryBlockToOpen"/>
+        <waitForElementVisible selector="{{CheckoutOrderSummarySection.productItemName}}" stepKey="waitForProductNameOnCheckoutPage"/>
+        <see selector="{{CheckoutOrderSummarySection.productItemName}}" userInput="$createProduct.name$" stepKey="assertProductNameOnOrderSummaryBlock"/>
+        <!--Place Order-->
+        <waitForElementVisible selector="{{CheckoutShippingMethodsSection.next}}" stepKey="waitForNextButton"/>
+        <click selector="{{CheckoutShippingMethodsSection.next}}" stepKey="clickNextButton"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectPaymentMethod"/>
+        <actionGroup ref="CheckoutPlaceOrderActionGroup" stepKey="customerPlaceOrder">
+            <argument name="orderNumberMessage" value="CONST.successCheckoutOrderNumberMessage"/>
+            <argument name="emailYouMessage" value="CONST.successCheckoutEmailYouMessage"/>
+        </actionGroup>
+        <!--Go to Admin Orders grid and open created Order-->
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="grabOrderNumber"/>
+        <actionGroup ref="OpenOrderById" stepKey="openCreatedOrder">
+            <argument name="orderId" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <!--Assert product name and sku in Items Ordered grid -->
+        <waitForElementVisible selector="{{AdminOrderItemsOrderedSection.productNameColumn}}" stepKey="waitForProductNameOnOrderItemPage"/>
+        <see selector="{{AdminOrderItemsOrderedSection.productNameColumn}}" userInput="$createProduct.name$" stepKey="assertProductNameInItemsOrderedSection"/>
+        <see selector="{{AdminOrderItemsOrderedSection.itemProductSku('1')}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInItemsOrderedSection"/>
+        <!--Create Invoice for the Order-->
+        <actionGroup ref="StartCreateInvoiceFromOrderPage" stepKey="startCreateInvoice"/>
+        <actionGroup ref="SubmitInvoice" stepKey="submitInvoice"/>
+        <!--Open created Invoice-->
+        <actionGroup ref="AdminOpenInvoiceFromOrderPageActionGroup" stepKey="openInvoiceFromOrder"/>
+        <!--Assert product name and sku in the Invoice -->
+        <see selector="{{AdminInvoiceItemsSection.nameColumn}}" userInput="$createProduct.name$" stepKey="assertProductNameInItemsInvoicedPage"/>
+        <see selector="{{AdminInvoiceItemsSection.skuColumn}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInItemsInvoicedPage"/>
+        <!-- Open order -->
+        <actionGroup ref="OpenOrderById" stepKey="openOrderForCreatingShipment">
+            <argument name="orderId" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <!--Create Shipment for the order-->
+        <actionGroup ref="goToShipmentIntoOrder" stepKey="startCreateShipment"/>
+        <actionGroup ref="submitShipmentIntoOrder" stepKey="submitShipment"/>
+        <!--Open created shipment-->
+        <actionGroup ref="AdminOpenShipmentFromOrderPageActionGroup" stepKey="openShipmentFromOrder"/>
+        <!--Assert product name and sku in the Shipment-->
+        <see selector="{{AdminShipmentItemsSection.itemName('1')}}" userInput="$createProduct.name$" stepKey="assertProductNameInShipment"/>
+        <see selector="{{AdminShipmentItemsSection.itemSku('1')}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInShipment"/>
+        <!--Create Credit Memo-->
+        <actionGroup ref="OpenOrderById" stepKey="openOrderPage">
+            <argument name="orderId" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <actionGroup ref="AdminStartToCreateCreditMemoFromOrderPageActionGroup" stepKey="createCreditMemo"/>
+        <fillField selector="{{AdminCreditMemoTotalSection.refundShipping}}" userInput="0" stepKey="setRefundShipping"/>
+        <actionGroup ref="UpdateCreditMemoTotalsActionGroup" stepKey="updateTotals"/>
+        <actionGroup ref="SubmitCreditMemoActionGroup" stepKey="submitCreditMemo"/>
+        <!--Open Created Memo-->
+        <actionGroup ref="AdminOpenCreditMemoFromOrderPageActionGroup" stepKey="openCreditMemo"/>
+        <!--Assert product name and sku in the Credit Memo-->
+        <see selector="{{AdminCreditMemoItemsSection.itemName('1')}}" userInput="$createProduct.name$" stepKey="assertProductNameInCreditMemo"/>
+        <see selector="{{AdminCreditMemoItemsSection.itemSku('1')}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInCreditMemo"/>
+        <!--Create Returns for the Order-->
+        <actionGroup ref="OpenOrderById" stepKey="openCreatedOrderPage">
+            <argument name="orderId" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <actionGroup ref="createReturns" stepKey="createReturns">
+            <argument name="customer" value="$createCustomer$"/>
+        </actionGroup>
+        <actionGroup ref="goToReturnItemsTab" stepKey="goToReturnItemsTab"/>
+        <waitForPageLoad stepKey="waitForReturnItemsPageLoad"/>
+        <actionGroup ref="addReturnItem" stepKey="addReturnItem">
+            <argument name="product" value="$createProduct$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForReturnItemsAdd"/>
+        <actionGroup ref="submitReturnItem" stepKey="submitReturnItem"/>
+        <waitForPageLoad stepKey="waitForReturnItemsSubmitLoad"/>
+        <!--Go to Admin -> Sales -> Returns-->
+        <actionGroup ref="AdminGoToReturnPage" stepKey="goToReturnPage"/>
+        <!--Open new created return-->
+        <actionGroup ref="filterReturnsByOrder" stepKey="openCreatedReturn">
+            <argument name="orderId" value="{$grabOrderNumber}"/>
+        </actionGroup>
+        <click selector="{{AdminReturnInformationSection.returnItems}}" stepKey="clickReturnItems"/>
+        <waitForPageLoad stepKey="waitForReturnItemsLoad"/>
+        <!--Assert product name and sku in the Shipment-->
+        <see selector="{{AdminReturnItemsTabSection.productName('1')}}" userInput="$createProduct.name$" stepKey="assertProductNameInReturns"/>
+        <see selector="{{AdminReturnItemsTabSection.productSku('1')}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInReturns"/>
+        <!--Go to created category page and click on the category from preconditions-->
+        <actionGroup ref="goToAdminCategoryPageById" stepKey="openCategory">
+            <argument name="id" value="$createCategory.id$"/>
+        </actionGroup>
+        <!--Expand 'Products in Category' section-->
+        <conditionalClick selector="{{AdminCategoryProductsSection.sectionHeader}}" dependentSelector="{{AdminCategoryProductsSection.sectionBody}}" visible="false" stepKey="clickOnProductInCategoryTitle"/>
+        <waitForElementVisible selector="{{AdminCategoryProductsSection.sectionBody}}" stepKey="waitProductsInCategoryBody"/>
+        <scrollTo selector="{{AdminCategoryProductsSection.sectionHeader}}" stepKey="scrollToProductInCategoryTitle"/>
+        <!--Assert product name and sku-->
+        <waitForElementVisible selector="{{AdminCategoryProductsGridSection.nameColumn}}" stepKey="waitForProduct"/>
+        <see selector="{{AdminCategoryProductsGridSection.nameColumn}}" userInput="$createProduct.name$" stepKey="assertProductNameInCategory"/>
+        <see selector="{{AdminCategoryProductsGridSection.skuColumn}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInCategory"/>
+        <!--Click 'Add Products' button-->
+        <click selector="{{AdminCategoryProductsSection.addProducts}}" stepKey="clickAddProducts"/>
+        <waitForPageLoad stepKey="waitForPopupLoad"/>
+        <actionGroup ref="filterProductGridBySku" stepKey="filterProductGridByProductSku">
+            <argument name="product" value="$createProduct$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForFilterComplete"/>
+        <!--Assert product name and sku-->
+        <waitForElementVisible selector="{{AdminCategoryProductsSection.productNameInAddProductsPopup}}" stepKey="waitForProductInPopup"/>
+        <see selector="{{AdminCategoryProductsSection.productNameInAddProductsPopup}}" userInput="$createProduct.name$" stepKey="assertProductNameInCategoryPage"/>
+        <see selector="{{AdminCategoryProductsSection.productSKUInAddProductsPopup}}" userInput="$createProduct.sku$" stepKey="assertProductSKUInCategoryPage"/>
+    </test>
+</tests>

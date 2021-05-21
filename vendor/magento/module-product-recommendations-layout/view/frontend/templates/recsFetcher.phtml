@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<?php /* @var $block \Magento\ProductRecommendationsLayout\Block\Fetcher */ ?>
+
+<script>
+    window.dsDataLayer.alternateEnvironmentId = "<?= /* @noEscape */ $block->getAlternateEnvironmentId(); ?>";
+</script>
+
+<script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_ProductRecommendationsLayout/js/recsFetcher": {}
+            }
+        }
+</script>

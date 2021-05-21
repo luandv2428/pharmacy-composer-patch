@@ -1,0 +1,98 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /* @var $block \Magento\ServicesId\Block\Adminhtml\System\Config\RequestProject */ ?>
+
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/alert',
+        'prototype'
+    ], function($, modalAlert){
+
+        let requestProjectSpan = $('#request_project_span');
+
+        $('#cancel_project_button').click(function () {
+            $('#services_connector_services_id_saas_project').hide();
+            $('#create_project_button').show();
+        });
+
+        $('#update_project_button').click(function () {
+            let projectName = $('#services_connector_services_id_saas_project_project_name').val();
+            let projectId = $('#services_connector_services_id_project_id').val();
+            let params = {
+                'method': 'PATCH',
+                'uri': `registry/projects/${projectId}`,
+                'projectName': projectName
+            };
+            callApi('<?= $block->escapeUrl($block->getProjectUrl()) ?>', params);
+        });
+
+        $('#request_project_button').click(function () {
+            let projectName = $('#services_connector_services_id_saas_project_project_name').val();
+            let params = {
+                'method': 'POST',
+                'uri': 'registry/initialize',
+                'projectName': projectName
+            };
+           callApi('<?= $block->escapeUrl($block->getInitializeUrl()) ?>', params);
+        });
+
+        function callApi(controllerUrl, params) {
+            new Ajax.Request(controllerUrl, {
+                parameters: params,
+                loaderArea: false,
+                asynchronous: true,
+                onCreate: function () {
+                    requestProjectSpan.find('.project_created').hide();
+                    requestProjectSpan.find('.error').hide();
+                    requestProjectSpan.find('.processing').show();
+                    $('#request_project_message_span').text('');
+                },
+                onSuccess: function (response) {
+                    requestProjectSpan.find('.processing').hide();
+
+                    var resultText = '';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                        showErrorAlert(resultText);
+                    } else if (response.responseJSON !== null
+                        && response.status === 200
+                        && !response.responseJSON.message
+                    ) {
+                        resultText = '<?= /* @escapeNotVerified */ __("Success. Saving and reloading page...") ?>';
+                        requestProjectSpan.find('.project_created').show();
+                        location.reload();
+                    } else {
+                        resultText = '<?= /* @escapeNotVerified */ __("An error occurred updating project") ?>';
+                        requestProjectSpan.find('.error').show();
+                        showErrorAlert(resultText);
+                    }
+                    $('#request_project_message_span').text(resultText);
+                }
+            });
+
+            function showErrorAlert(content) {
+                modalAlert({
+                    title: 'Magento Services Error',
+                    content: content,
+                    clickableOverlay: false,
+                    actions: {
+                        always: function() {}
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+<?php echo $block->getButtonHtml() ?>
+<span class="request_project-indicator" id="request_project_span">
+    <img class="processing" hidden="hidden" alt="Creating project" style="margin:0 5px" src="<?php echo $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
+    <img class="project_created" hidden="hidden" alt="Project created!" style="margin:-3px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_apply.gif') ?>"/>
+    <img class="error" hidden="hidden" alt="Error" style="margin:-1px 5px" src="<?php echo $block->getViewFileUrl('images/rule_component_remove.gif') ?>"/>
+    <span id="request_project_message_span"></span>
+</span>

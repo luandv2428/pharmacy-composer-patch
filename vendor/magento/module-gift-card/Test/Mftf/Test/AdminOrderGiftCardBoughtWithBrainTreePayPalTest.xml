@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminOrderGiftCardBoughtWithBrainTreePayPalTest">
+        <annotations>
+            <features value="GiftCard"/>
+            <title value="Order with GiftCard product bought with Braintree Paypal is successful"/>
+            <description value="Order with GiftCard product bought with Braintree Paypal is successful"/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="MC-17608"/>
+            <useCaseId value="MC-16375"/>
+            <group value="GiftCard"/>
+            <skip>
+                <issueId value="MQE-1576"/>
+            </skip>
+        </annotations>
+        <before>
+            <actionGroup ref="LoginAsAdmin" stepKey="logInAsAdmin"/>
+            <!--Create virtual gift card-->
+            <comment userInput="Create virtual gift card" stepKey="commentCreateGiftCard"/>
+            <createData entity="VirtualGiftCardOpenAmount10_150" stepKey="createVirtualGiftCard"/>
+            <!--Configure BrainTree PayPal-->
+            <comment userInput="Configure BrainTree PayPal" stepKey="commentConfigureBraintreePaypal"/>
+            <createData entity="BraintreeConfig" stepKey="createBraintreeConfig"/>
+            <magentoCLI command="config:set payment/braintree/payment_action authorize_capture" stepKey="setBrainTreePaymentAction"/>
+            <magentoCLI command="config:set payment/braintree/active 1" stepKey="setBrainTreeActive"/>
+            <magentoCLI command="config:set payment/braintree_paypal/active 1" stepKey="setBrainTreePayPalActive"/>
+            <!--Configure advanced BrainTree settings-->
+            <comment userInput="Configure advanced BrainTree settings" stepKey="commentAdvancedBraintree"/>
+            <magentoCLI command="config:set payment/braintree/merchant_account_id Magneto" stepKey="setMerchantAcountId"/>
+            <magentoCLI command="config:set payment/braintree/useccv 1" stepKey="setCVVVerification"/>
+            <!--Configure PayPal through Braintree-->
+            <comment userInput="Configure PayPal through Braintree" stepKey="commentPayPalThroughBraintree"/>
+            <magentoCLI command="config:set payment/braintree_paypal/title 'PayPal (Braintree)'" stepKey="setBrainTreePayPalTitle"/>
+            <magentoCLI command="config:set payment/braintree_paypal/payment_action authorize" stepKey="setBrainTreePayPalPaymentAction"/>
+            <magentoCLI command="config:set payment/braintree_paypal/skip_order_review 1" stepKey="setBrainTreePayPalSkipOrderReview"/>
+            <magentoCLI command="indexer:reindex" stepKey="reindex"/>
+            <magentoCLI command="cache:flush" stepKey="flushCache"/>
+        </before>
+        <after>
+            <!--Reset settings-->
+            <comment userInput="Reset settings" stepKey="commentResetSettings"/>
+            <magentoCLI command="config:set payment/braintree/active 0" stepKey="setBrainTreeNotActive"/>
+            <magentoCLI command="config:set payment/braintree_paypal/active 0" stepKey="setBrainTreePayPalNotActive"/>
+            <!--Delete created data-->
+            <comment userInput="Delete created data" stepKey="commentDeleteCreatedData"/>
+            <deleteData createDataKey="createVirtualGiftCard" stepKey="deleteGiftCard"/>
+            <actionGroup ref="logout" stepKey="logOut"/>
+        </after>
+        <!--Add GiftCard to cart-->
+        <comment userInput="Add GiftCard to cart" stepKey="commentAddToCart"/>
+        <amOnPage url="{{StorefrontProductPage.url($$createVirtualGiftCard.custom_attributes[url_key]$$)}}" stepKey="navigateToGiftCardProductPage"/>
+        <waitForPageLoad stepKey="waitForGiftCardProductPageLoad"/>
+        <actionGroup ref="StorefrontFillGiftCardSenderRequiredFieldsActionGroup" stepKey="fillSenderData">
+            <argument name="amount" value="{{OpenAmount150.value}}"/>
+            <argument name="sender" value="Simple_US_Customer"/>
+            <argument name="receiver" value="Simple_US_Customer"/>
+        </actionGroup>
+        <actionGroup ref="addToCartFromStorefrontProductPage" stepKey="addToCartGiftCardFromStorefrontProductPage">
+            <argument name="productName" value="$$createVirtualGiftCard.name$$"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForAddToCart"/>
+        <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="goToCheckoutFromMinicartActionGroup"/>
+        <waitForPageLoad stepKey="waitForCheckoutPaymentPageLoad"/>
+        <!--Place an order using PayPal method-->
+        <comment userInput="Place an order using PayPal method" stepKey="commentPayPalPlaceOrder"/>
+        <fillField selector="{{CheckoutPaymentSection.email}}" userInput="{{Simple_US_Customer.email}}" stepKey="fillEmailField"/>
+        <click selector="{{CheckoutPaymentSection.payPalPaymentBraintree}}" stepKey="clickPayPalRadioButton"/>
+        <waitForElementVisible selector="{{CheckoutPaymentSection.payPalFrame}}" stepKey="waitForjoiPayPalButton"/>
+        <executeJS function="document.getElementsByTagName('iframe')[0].setAttribute('name', 'ppbutton');" stepKey="executeJSChangeIframeName"/>
+        <switchToIFrame userInput="ppbutton" stepKey="switchToIFrame"/>
+        <waitForElementVisible selector="{{CheckoutPaymentSection.PayPalBtn}}" stepKey="waitForPayPalButton"/>
+        <click selector="{{CheckoutPaymentSection.PayPalBtn}}" stepKey="clickPayPalButton"/>
+        <switchToNextTab stepKey="switchToInContentTab"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <seeCurrentUrlMatches regex="~\//www.sandbox.paypal.com/~" stepKey="seeCurrentUrlMatchesConfigPath1"/>
+        <waitForElement selector="{{PayPalPaymentSection.email}}" stepKey="waitForLoginForm" />
+        <actionGroup ref="LoginToPayPalPaymentAccount" stepKey="loginToPayPal">
+            <argument name="userName" value="{{Payer.buyerEmail}}"/>
+            <argument name="password" value="{{Payer.buyerPassword}}"/>
+        </actionGroup>
+        <switchToPreviousTab stepKey="switchToPreviousTab"/>
+        <waitForElementVisible time="60" selector="{{CheckoutSuccessMainSection.success}}" stepKey="waitForPSuccessfullyPlaced"/>
+        <see userInput="Thank you for your purchase!" stepKey="seeSuccessMessage"/>
+        <seeElement selector="{{CheckoutSuccessMainSection.success}}" stepKey="orderIsSuccessfullyPlaced" />
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber}}" stepKey="grabOrderNumber"/>
+        <!--Check that order is created-->
+        <comment userInput="Check that order is created" stepKey="commentCheckOrderCreated"/>
+        <actionGroup ref="filterOrderGridById" stepKey="filterOrderGridById">
+            <argument name="orderId" value="$grabOrderNumber"/>
+        </actionGroup>
+        <see selector="{{AdminOrdersGridSection.firstRow}}" userInput="$grabOrderNumber" stepKey="seeOrderIdInGrid"/>
+        <see selector="{{AdminOrdersGridSection.firstRow}}" userInput="Processing" stepKey="seeStatusInGrid"/>
+    </test>
+</tests>

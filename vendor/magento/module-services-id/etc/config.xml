@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <services_connector>
+            <services_id>
+                <environment>Testing</environment>
+                <registry_api_path>merchant-registry</registry_api_path>
+                <registry_api_version>v1</registry_api_version>
+            </services_id>
+        </services_connector>
+    </default>
+</config>

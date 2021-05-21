@@ -1,0 +1,6 @@
+.DS_Store
+.php_cs
+git_push.sh
+/vendor
+*.lock
+*.ini

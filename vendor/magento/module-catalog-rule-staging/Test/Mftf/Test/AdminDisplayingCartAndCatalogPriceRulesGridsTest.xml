@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="AdminDisplayingCartAndCatalogPriceRulesGridsTest">
+        <annotations>
+            <features value="CatalogRule"/>
+            <stories value="Cart and Catalog Price Rules grids"/>
+            <title value="Displaying Cart/Catalog Price Rules grids"/>
+            <description value="Displaying Cart/Catalog Price Rules grids"/>
+            <severity value="MAJOR"/>
+            <testCaseId value="MC-17843"/>
+            <useCaseId value="MC-17493"/>
+            <group value="catalogRule"/>
+        </annotations>
+        <before>
+            <!-- Login as Admin -->
+            <comment userInput="Login as Admin" stepKey="commentLoginAsAdmin"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="login"/>
+        </before>
+        <after>
+            <!-- Delete created data -->
+            <comment userInput="Delete created data" stepKey="commentDeleteData"/>
+            <actionGroup ref="AdminDeleteWebsiteActionGroup" stepKey="deleteFirstWebsite">
+                <argument name="websiteName" value="FirstWebsite"/>
+            </actionGroup>
+            <actionGroup ref="AdminDeleteWebsiteActionGroup" stepKey="deleteSecondWebsite">
+                <argument name="websiteName" value="SecondWebsite"/>
+            </actionGroup>
+            <magentoCLI command="indexer:reindex" stepKey="reindexAfterDelete"/>
+            <magentoCLI command="cache:flush" stepKey="flushCacheAfterDelete"/>
+            <actionGroup ref="AdminDeleteCreatedUserActionGroup" stepKey="deleteUser">
+                <argument name="user" value="newAdmin"/>
+            </actionGroup>
+            <actionGroup ref="AdminDeleteUserRoleActionGroup" stepKey="AdminDeleteRoleActionGroup">
+                <argument name="roleName" value="{{RestrictedAdminRole.name}}"/>
+            </actionGroup>
+            <actionGroup ref="AdminDeleteCartPriceRuleActionGroup" stepKey="deleteCartPriceRule">
+                <argument name="ruleName" value="CatPriceRule" />
+            </actionGroup>
+            <!-- Log out -->
+            <comment userInput="Log out" stepKey="commentLogOut"/>
+            <actionGroup ref="logout" stepKey="logout"/>
+        </after>
+        <!--Create two Websites -->
+        <comment userInput="Create two Websites " stepKey="commentCreateWebsites"/>
+        <actionGroup ref="AdminCreateWebsiteActionGroup" stepKey="createFirstWebsite">
+            <argument name="newWebsiteName" value="FirstWebsite"/>
+            <argument name="websiteCode" value="FirstWebsite"/>
+        </actionGroup>
+        <!-- Create first store -->
+        <comment userInput="Create first Store" stepKey="commentCreateFirstStore"/>
+        <actionGroup ref="AdminCreateNewStoreGroupActionGroup" stepKey="createFirstStore">
+            <argument name="website" value="FirstWebsite"/>
+            <argument name="storeGroupName" value="{{customStore.name}}"/>
+            <argument name="storeGroupCode" value="{{customStore.code}}"/>
+        </actionGroup>
+        <!-- Create first store view -->
+        <comment userInput="Create first Store view" stepKey="commentCreateFirstStoreView"/>
+        <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createFirstStoreView">
+            <argument name="StoreGroup" value="customStore"/>
+            <argument name="customStore" value="storeViewData1"/>
+        </actionGroup>
+        <waitForPageLoad stepKey="waitForNextActionGroupPageLoad"/>
+        <actionGroup ref="AdminCreateWebsiteActionGroup" stepKey="createSecondWebsite">
+            <argument name="newWebsiteName" value="SecondWebsite"/>
+            <argument name="websiteCode" value="SecondWebsite"/>
+        </actionGroup>
+        <!-- Create second store -->
+        <comment userInput="Create second Store" stepKey="commentCreateSecondStore"/>
+        <actionGroup ref="AdminCreateNewStoreGroupActionGroup" stepKey="createSecondStore">
+            <argument name="website" value="SecondWebsite"/>
+            <argument name="storeGroupName" value="{{customStoreGroup.name}}"/>
+            <argument name="storeGroupCode" value="{{customStoreGroup.code}}"/>
+        </actionGroup>
+        <!-- Create second store view -->
+        <comment userInput="Create second Store view" stepKey="commentCreateSecondStoreView"/>
+        <actionGroup ref="AdminCreateStoreViewActionGroup" stepKey="createSecondStoreView">
+            <argument name="StoreGroup" value="customStoreGroup"/>
+            <argument name="customStore" value="storeViewData2"/>
+        </actionGroup>
+        <!-- Run cron, reindex and flash cache -->
+        <comment userInput="Run cron, reindex and flash cache" stepKey="commentRunCommands"/>
+        <magentoCLI command="cron:run" stepKey="runCronFirst"/>
+        <magentoCLI command="indexer:reindex" stepKey="reindexFirst"/>
+        <magentoCLI command="cache:flush" stepKey="flushCacheFirst"/>
+        <!-- Add admin custom Role -->
+        <comment userInput="Add admin custom Role" stepKey="commentCreateAdminRole"/>
+        <actionGroup ref="AdminCreateUserRoleWithMultipleWebsiteScopeActionGroup" stepKey="createAdminRole">
+            <argument name="role" value="RestrictedAdminRole"/>
+            <argument name="FirstWebsite" value="FirstWebsite"/>
+            <argument name="SecondWebsite" value="SecondWebsite"/>
+        </actionGroup>
+        <!-- Add new user for admin Role -->
+        <comment userInput="Add new user" stepKey="commentCreateNewUser"/>
+        <actionGroup ref="AdminCreateUserActionGroup" stepKey="createAdminUser">
+            <argument name="role" value="RestrictedAdminRole"/>
+        </actionGroup>
+        <!-- Create a cart price rule -->
+        <comment userInput="Create a cart price rule" stepKey="commentCreateCartPriceRule"/>
+        <actionGroup ref="AdminCreateMultiWebsiteCartPriceRuleActionGroup" stepKey="createCartPriceRule">
+            <argument name="ruleName" value="CatPriceRule"/>
+        </actionGroup>
+        <click selector="{{AdminCartPriceRulesFormSection.save}}" stepKey="clickSaveButton"/>
+        <see selector="{{AdminCartPriceRulesFormSection.successMessage}}" userInput="You saved the rule." stepKey="seeSuccessMessage"/>
+        <!-- Login as created new user -->
+        <comment userInput="Login as created new user" stepKey="commentLoginAsUser"/>
+        <actionGroup ref="logout" stepKey="logoutAsAdmin1"/>
+        <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdminUser">
+            <argument name="adminUser" value="newAdmin"/>
+        </actionGroup>
+        <!-- Check created cart price rules existing -->
+        <comment userInput="Check created cart price rules existing" stepKey="commentCheckPriceRule"/>
+        <amOnPage url="{{AdminCartPriceRulesPage.url}}" stepKey="amOnCartPriceList"/>
+        <waitForPageLoad stepKey="waitForRulesPage"/>
+        <see userInput="{{CatPriceRule.name}}" stepKey="verifyText"/>
+        <!-- Create a catalog price rule from admin page -->
+        <comment userInput="Create a catalog price rule" stepKey="commentCreateCatalogPriceRule"/>
+        <actionGroup ref="logout" stepKey="logoutAsDefaultAdmin"/>
+        <actionGroup ref="LoginAsAdmin" stepKey="loginAsDefaultAdmin"/>
+        <amOnPage url="{{CatalogRulePage.url}}" stepKey="goToCatalogPriceRulePage"/>
+        <waitForPageLoad stepKey="waitForCatalogRulePage"/>
+        <actionGroup ref="AdminCreateMultipleWebsiteCatalogPriceRule" stepKey="createCatalogPriceRule">
+            <argument name="catalogRuleName" value="CatalogRuleWithAllCustomerGroups"/>
+        </actionGroup>
+        <actionGroup ref="selectNotLoggedInCustomerGroup" stepKey="selectNotLoggedInCustomerGroupCatalogRule"/>
+        <click selector="{{AdminNewCatalogPriceRule.save}}" stepKey="clickToSaveButton"/>
+        <!-- Login as created new user -->
+        <comment userInput="Login as created new user" stepKey="commentLoginAsUserAgain"/>
+        <actionGroup ref="logout" stepKey="logoutAsCreatedNewAdmin"/>
+        <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin3">
+            <argument name="adminUser" value="newAdmin"/>
+        </actionGroup>
+        <!-- Check created catalog price rules existing -->
+        <comment userInput="Check created catalog price rules existing" stepKey="commentCheckCatalogRule"/>
+        <amOnPage url="{{CatalogRulePage.url}}" stepKey="goToCatalogRulePage" />
+        <waitForPageLoad stepKey="waitForCatalogPriceRulePage"/>
+        <see userInput="{{_defaultCatalogRule.name}}" stepKey="verifyCatalogRuleText"/>
+        <waitForPageLoad stepKey="waitForPageLoad"/>
+        <!-- Log out -->
+        <comment userInput="Log out" stepKey="commentLogOutAgain"/>
+        <actionGroup ref="logout" stepKey="logoutAgain"/>
+        <!-- Login as Admin -->
+        <comment userInput="Login as Admin" stepKey="commentLoginAsAdminAgain"/>
+        <actionGroup ref="LoginAsAdmin" stepKey="loginAgain"/>
+    </test>
+</tests>

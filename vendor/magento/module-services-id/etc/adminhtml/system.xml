@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="services_connector" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Magento Services</label>
+            <tab>service</tab>
+            <resource>Magento_ServicesId::config_settings</resource>
+            <group id="services_id" translate="label comment" type="text" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>SaaS Environment</label>
+                <field id="project_id" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>SaaS Project</label>
+                    <frontend_model>Magento\ServicesId\Block\Adminhtml\System\Config\SelectProject</frontend_model>
+                </field>
+
+                <group id="saas_project" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <field id="project_name" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Project Name</label>
+                        <comment>Friendly name for this Project</comment>
+                        <config_path>services_connector/services_id/project_name</config_path>
+                    </field>
+                    <field id="request_project" translate="label comment" type="button" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <frontend_model>Magento\ServicesId\Block\Adminhtml\System\Config\RequestProject</frontend_model>
+                    </field>
+                </group>
+
+                <field id="environment_id" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>SaaS Environment</label>
+                    <frontend_model>Magento\ServicesId\Block\Adminhtml\System\Config\SelectEnvironment</frontend_model>
+                </field>
+
+                <group id="saas_environment" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <field id="environment_name" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Environment Name</label>
+                        <comment>Friendly name for this Environment</comment>
+                        <config_path>services_connector/services_id/environment_name</config_path>
+                    </field>
+                    <field id="request_environment" translate="label comment" type="button" sortOrder="9" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <frontend_model>Magento\ServicesId\Block\Adminhtml\System\Config\UpdateEnvironment</frontend_model>
+                    </field>
+                    <field id="environment" translate="label" type="hidden" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Environment Type</label>
+                        <config_path>services_connector/services_id/environment</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

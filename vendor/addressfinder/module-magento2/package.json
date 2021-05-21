@@ -1,0 +1,38 @@
+{
+  "name": "addressfinder-magento",
+  "version": "1.5.0",
+  "devDependencies": {
+    "@addressfinder/addressfinder-webpage-tools": "^1.8.1",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "babel-loader": "^8.1.0",
+    "uglify-js": "^3.9.2",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "scripts": {
+    "watch": "npm run build && webpack -w --config webpack.config.js --mode=development",
+    "build": "webpack --config webpack.config.js --mode=none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AbleTech/addressfinder-magento.git"
+  },
+  "keywords": [
+    "magento",
+    "addressfinder",
+    "widget",
+    "extension",
+    "autocomplete",
+    "address",
+    "verification",
+    "verify"
+  ],
+  "author": "@Abletech",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abletech/addressfinder-magento/issues"
+  },
+  "homepage": "https://github.com/abletech/addressfinder-magento#readme"
+}
