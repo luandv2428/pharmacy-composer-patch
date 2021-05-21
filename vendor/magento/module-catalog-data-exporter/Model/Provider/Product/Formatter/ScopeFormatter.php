@@ -10,7 +10,7 @@ namespace Magento\CatalogDataExporter\Model\Provider\Product\Formatter;
 use Magento\Framework\App\ResourceConnection;
 
 /**
- * Class ScopeFormatter
+ * Scope formatter for product provider
  */
 class ScopeFormatter implements FormatterInterface
 {
@@ -49,10 +49,14 @@ class ScopeFormatter implements FormatterInterface
     /**
      * Get scopes
      *
+     * @param bool $resetCache
      * @return array
      */
-    private function getScopes()
+    private function getScopes($resetCache = false): array
     {
+        if ($resetCache) {
+            $this->scopes = [];
+        }
         if (!$this->scopes) {
             $connection = $this->resourceConnection->getConnection();
             $select = $connection->select()
@@ -88,6 +92,12 @@ class ScopeFormatter implements FormatterInterface
      */
     public function format(array $row): array
     {
-        return array_merge($row, $this->getScopes()[$row['storeViewCode']]);
+        $scopes = $this->getScopes();
+        if (!isset($scopes[$row['storeViewCode']])) {
+            $scopes = $this->getScopes(true);
+        }
+        $scope = $scopes[$row['storeViewCode']] ?? null;
+
+        return $scope ? array_merge($row, $scope) : $row;
     }
 }

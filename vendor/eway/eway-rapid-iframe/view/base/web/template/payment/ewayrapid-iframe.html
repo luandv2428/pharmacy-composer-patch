@@ -1,0 +1,23 @@
+<!-- ko if: isTokenEnabled() -->
+<div class="field-token-list admin__field">
+       <div class="admin__field-control">
+              <select class="token-list"
+                      data-bind=" options:        tokenList,
+                                optionsText:    'card',
+                                value:          selectedToken,
+                                optionsCaption: 'Use a new card'"></select>
+       </div>
+</div>
+<div class="field-token-list admin__field" data-bind="visible: !selectedToken() && canCreateToken()">
+       <div class="admin__field-control">
+              <input type="checkbox" id="save_card" class="checkbox" data-bind="checked: saveCard"/>
+              <label for="save_card" class="label"><span data-bind="text: getSaveText()"></span></label>
+       </div>
+</div>
+<input type="hidden" id="ewayrapid_token_id" name="payment[additional_information][TokenID]" value="" />
+<input type="hidden" id="ewayrapid_token_action" name="payment[additional_information][TokenAction]" value="" />
+<!-- /ko -->
+
+<input type="hidden" id="ewayrapid_access_code" name="payment[additional_information][AccessCode]" value=""
+       data-bind="afterRender: loadScript"/>
+<input type="hidden" name="ewayrapid_create_from_admin" value="1" />

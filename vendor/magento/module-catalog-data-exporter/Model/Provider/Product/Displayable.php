@@ -12,7 +12,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
- * Class Displayable
+ * Is product displayable data provider
  */
 class Displayable
 {
@@ -27,8 +27,6 @@ class Displayable
     private $unavailableProductQuery;
 
     /**
-     * Displayable constructor.
-     *
      * @param ResourceConnection $resourceConnection
      * @param UnavailableProductQuery $unavailableProductQuery
      */
@@ -51,6 +49,8 @@ class Displayable
     public function get(array $values) : array
     {
         $connection = $this->resourceConnection->getConnection();
+        $queryArguments = [];
+
         foreach ($values as $value) {
             $queryArguments['productId'][$value['productId']] = $value['productId'];
             $queryArguments['storeViewCode'][$value['storeViewCode']] = $value['storeViewCode'];
@@ -72,7 +72,7 @@ class Displayable
                 'productId' => $value['productId'],
                 'storeViewCode' => $value['storeViewCode'],
                 'displayable' => (
-                    $value['status'] == 'Enabled'
+                    $value['status'] === 'Enabled'
                     && in_array($value['visibility'], ['Catalog', 'Search', 'Catalog, Search'])
                     && !isset($unavailable[$value['storeViewCode']][$value['productId']])
                 )

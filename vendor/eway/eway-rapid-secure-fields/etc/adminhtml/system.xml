@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="ewayrapid">
+                <field id="live_public_api_key" translate="label" type="text" sortOrder="241" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Live Public API Key</label>
+                    <depends>
+                        <field id="connection_type">securefields</field>
+                        <field id="mode">live</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-find-my-Public-API-Key" target="_blank">How do I find my Public API Key</a>]]>
+                    </comment>
+                </field>
+                <field id="sandbox_public_api_key" translate="label" type="text" sortOrder="281" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox Public API Key</label>
+                    <depends>
+                        <field id="connection_type">securefields</field>
+                        <field id="mode">sandbox</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-find-my-Public-API-Key" target="_blank">How do I find my Public API Key</a>]]>
+                    </comment>
+                </field>
+
+                <field id="field_styles" translate="label" type="textarea" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Field Styles</label>
+                    <depends>
+                        <field id="connection_type">securefields</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

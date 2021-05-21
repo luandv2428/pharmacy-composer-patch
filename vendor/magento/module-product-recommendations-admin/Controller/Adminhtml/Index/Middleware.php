@@ -52,10 +52,9 @@ class Middleware extends AbstractAction
         $method = $this->getRequest()->getParam('method', 'GET');
         $uri = $this->getRequest()->getParam('uri', '');
         $apiVersion = $this->getRequest()->getParam('apiVersion', '');
-        $storeViewCode = $this->getRequest()->getParam('storeViewCode', '');
         $payload = $this->getRequest()->getParam('payload', '');
 
-        $url = $this->serviceClient->getUrl($apiVersion, $uri, $storeViewCode);
+        $url = $this->serviceClient->getUrl($apiVersion, $uri);
         $result = $this->serviceClient->request($method, $url, $payload);
 
         return $jsonResult->setData($result);

@@ -79,8 +79,7 @@ class Urls
             $connection = $this->resourceConnection->getConnection();
             $baseUrls = [];
             foreach ($this->storeConfigManager->getStoreConfigs($queryArguments['storeViewCode']) as $config) {
-                $url = preg_replace('#^http(s)?:#', '', $config->getBaseUrl());
-                $baseUrls[$config->getCode()] = $url;
+                $baseUrls[$config->getCode()] = $config->getBaseUrl();
             }
             $cursor = $connection->query($select);
             while ($row = $cursor->fetch()) {
@@ -89,7 +88,7 @@ class Urls
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve product URL data'));
+            throw new UnableRetrieveData('Unable to retrieve product URL data');
         }
         return $output;
     }

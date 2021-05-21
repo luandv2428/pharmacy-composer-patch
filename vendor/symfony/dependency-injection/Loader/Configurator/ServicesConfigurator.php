@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
  */
 class ServicesConfigurator extends AbstractConfigurator
 {
-    public const FACTORY = 'services';
+    const FACTORY = 'services';
 
     private $defaults;
     private $container;

@@ -13,4 +13,9 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\ConfigurableProductDataExporter\Model\Provider\Product\Options">
+        <arguments>
+            <argument name="batchSize" xsi:type="number">1000</argument>
+        </arguments>
+    </type>
 </config>

@@ -1,0 +1,76 @@
+<?php
+/** @var \Eway\EwayRapid\Block\Mycards\Listing $block */
+$_tokens = $block->getActiveTokensList();
+$_defaultToken = $block->getDefaultToken();
+?>
+
+<?php if (!empty($_tokens)) : ?>
+    <div class="table-wrapper">
+        <table class="data table">
+            <caption class="table-caption">
+                <?php /* @escapeNotVerified @noEscape*/ echo __('My Credit Cards') ?>
+            </caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col id"><?php /* @escapeNotVerified @noEscape*/ echo __('Card Type') ?></th>
+                <th scope="col" class="col date"><?php /* @escapeNotVerified @noEscape*/ echo __('Card Number') ?></th>
+                <th scope="col" class="col shipping">
+                    <?php /* @escapeNotVerified @noEscape*/ echo __('Expiration Date') ?>
+                </th>
+                <th scope="col" class="col actions">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($_tokens as $_id => $_token) : ?>
+            <?php /** @var \Eway\EwayRapid\Model\Customer\Token $_token */ ?>
+                <tr>
+                    <td data-th="<?php /* @escapeNotVerified @noEscape*/ echo __('Card Type') ?>" class="col">
+                        <?php /* @escapeNotVerified @noEscape*/ echo $_token->getType() ?>
+                    </td>
+                    <td data-th="<?php /* @escapeNotVerified @noEscape*/ echo __('Card Number') ?>" class="col">
+                        <?php /* @escapeNotVerified @noEscape*/ echo $_token->getCard() ?>
+                    </td>
+                    <td data-th="<?php /* @escapeNotVerified @noEscape*/ echo __('Expiration Date') ?>" class="col">
+                        <?php /* @escapeNotVerified @noEscape */
+                            echo sprintf('%s / %s', $_token->getExpMonth(), $_token->getExpYear()) ?>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                        <?php if ($block->canEditToken()) : ?>
+                            <a href="<?php /* @escapeNotVerified @noEscape*/ echo $block->getEditTokenUrl($_id) ?>"
+                               class="action">
+                                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Edit') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <a href="<?php /* @escapeNotVerified @noEscape*/ echo $block->getDeleteTokenUrl($_id) ?>"
+                           onclick="return confirm('<?php /* @escapeNotVerified @noEscape*/
+                                            echo __('Are you sure to delete this Credit Card?') ?>');"
+                           class="action">
+                            <span><?php /* @escapeNotVerified @noEscape*/ echo __('Delete') ?></span>
+                        </a>
+                        <?php if ($_id !== $_defaultToken) : ?>
+                        <a href="<?php /* @escapeNotVerified @noEscape*/ echo $block->getSetDefaultTokenUrl($_id) ?>"
+                           class="action">
+                            <span><?php /* @escapeNotVerified @noEscape*/ echo __('Set as default') ?></span>
+                        </a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else : ?>
+    <div class="message info empty">
+        <span><?php /* @escapeNotVerified @noEscape*/ echo __('You have no saved credit cards.'); ?></span>
+    </div>
+<?php endif ?>
+<div class="actions-toolbar">
+    <div class="primary">
+        <button type="button" title="<?php /* @escapeNotVerified @noEscape*/ echo __('Add New Credit Card') ?>"
+                class="action primary add" onclick="window.location.href='<?php
+                        /* @escapeNotVerified @noEscape*/ echo $block->getCreateTokenUrl() ?>'">
+            <span><?php /* @escapeNotVerified @noEscape*/ echo __('Add New Credit Card') ?></span>
+        </button>
+    </div>
+</div>
+

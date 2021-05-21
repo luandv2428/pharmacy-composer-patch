@@ -8,7 +8,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
   <default>
       <product_recommendations>
-          <frontend_url>https://commerce.adobe.net/loader.js</frontend_url>
+          <frontend_url>https://commerce.adobe.net/recs/v2/loader.js</frontend_url>
           <admin_api_path>recs-admin</admin_api_path>
           <content_security_policy>assets.adobedtm.com use.typekit.net performance.typekit.net p.typekit.net commerce.adobe.net amcglobal.sc.omtrdc.net fonts.googleapis.com fonts.gstatic.com</content_security_policy>
       </product_recommendations>

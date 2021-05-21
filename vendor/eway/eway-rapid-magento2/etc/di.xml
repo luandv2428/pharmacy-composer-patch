@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="\Eway\EwayRapid\Model\Customer\Token\ManagerInterface" type="\Eway\EwayRapid\Model\Customer\Token\Manager"/>
+    <preference for="\Magento\Payment\Gateway\Data\Quote\QuoteAdapter" type="\Eway\EwayRapid\Gateway\QuoteAdapter" />
+    
+    <virtualType name="EwayRapidMethodAdapter" type="\Eway\EwayRapid\Model\Method\Adapter">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- ###############################################################################################-->
+    <!-- ################               COMMON FOR ALL METHODS                          ################-->
+    <!-- ###############################################################################################-->
+    <!-- Config -->
+    <virtualType name="EwayRapidConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Eway\EwayRapid\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+    <type name="Eway\EwayRapid\Model\Ui\ConfigProvider">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Model\ModuleHelper">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Logger -->
+    <virtualType name="EwayRapidDefaultLoggerHandler" type="\Eway\EwayRapid\Model\Logger\Handler">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/ewayrapid_debug.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidCronLoggerHandler" type="\Eway\EwayRapid\Model\Logger\Handler">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/ewayrapid_cron.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidLogger" type="\Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">ewayrapid</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="ewayrapid" xsi:type="object">EwayRapidDefaultLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidCronLogger" type="\Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">ewayrapid_cron</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="ewayrapid" xsi:type="object">EwayRapidCronLoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidPaymentLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+            <argument name="logger" xsi:type="object">EwayRapidLogger</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value Handler Pool -->
+    <virtualType name="EwayRapidConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+    <type name="\Eway\EwayRapid\Gateway\Config\DefaultValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">EwayRapidConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayRapidDefaultValueHandlerPool" type="\Eway\EwayRapid\Gateway\Config\DefaultValueHandlerPool"/>
+
+    <!-- Validator Pool -->
+    <virtualType name="EwayRapidCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">EwayRapidCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="global" xsi:type="string">EwayRapidGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Client -->
+    <type name="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="logger" xsi:type="object">EwayRapidLogger</argument>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayRapidClientCreateTransaction" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::CREATE_TRANSACTION</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientQueryTransaction" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::QUERY_TRANSACTION</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientCreateCustomer" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::CREATE_CUSTOMER</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientUpdateCustomer" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::UPDATE_CUSTOMER</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientQueryToken" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::QUERY_CUSTOMER_TOKEN</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientCancelTransaction" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::CANCEL_TRANSACTION</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidClientRefundTransaction" type="\Eway\EwayRapid\Gateway\Client\Sdk">
+        <arguments>
+            <argument name="operation" xsi:type="const">\Eway\EwayRapid\Gateway\Client\Sdk::REFUND_TRANSACTION</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command Pool -->
+    <type name="Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">EwayRapidLogger</argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayRapidPreAuthCaptureCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientCreateTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidCaptureDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="handler"            xsi:type="object">EwayRapidTransactionCaptureHandler</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidPaymentActionValidator</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidCancelTransactionCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientCancelTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">\Eway\EwayRapid\Gateway\Request\TransactionIdDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidPaymentActionValidator</argument>
+            <argument name="handler"            xsi:type="object">\Eway\EwayRapid\Gateway\Response\TransactionCancelHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidRefundTransactionCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientRefundTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidRefundDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidPaymentActionValidator</argument>
+            <argument name="handler"            xsi:type="object">\Eway\EwayRapid\Gateway\Response\TransactionCancelHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidQueryTransactionByIdCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientQueryTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">\Eway\EwayRapid\Gateway\Request\TransactionIdDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="handler"            xsi:type="object">\Eway\EwayRapid\Gateway\Response\ResponseMessagesHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Request Builder -->
+    <type name="\Eway\EwayRapid\Gateway\Request\AbstractDataBuilder">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayRapidCaptureDataBuilder" type="\Eway\EwayRapid\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="payment"        xsi:type="string">\Eway\EwayRapid\Gateway\Request\PaymentDataBuilder</item>
+                <item name="transaction_id" xsi:type="string">\Eway\EwayRapid\Gateway\Request\TransactionIdDataBuilder</item>
+            </argument>
+            <argument name="method" xsi:type="const">\Eway\Rapid\Enum\ApiMethod::AUTHORISATION</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidRefundDataBuilder" type="\Eway\EwayRapid\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer"           xsi:type="string">\Eway\EwayRapid\Gateway\Request\CustomerDataBuilder</item>
+                <item name="shipping_address"   xsi:type="string">\Eway\EwayRapid\Gateway\Request\ShippingAddressDataBuilder</item>
+                <item name="items"              xsi:type="string">\Eway\EwayRapid\Gateway\Request\ItemsDataBuilder</item>
+                <item name="refund"             xsi:type="string">\Eway\EwayRapid\Gateway\Request\RefundDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Transfer Factory -->
+    <virtualType name="EwayRapidTransferFactory" type="\Eway\EwayRapid\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Response Handlers -->
+    <virtualType name="EwayRapidTransactionCaptureHandler" type="\Eway\EwayRapid\Gateway\Response\TransactionCaptureHandler" />
+    <virtualType name="EwayRapidCreateTokenHandler" type="\Eway\EwayRapid\Gateway\Response\CreateTokenHandler" />
+    <virtualType name="EwayRapidUpdateTokenHandler" type="\Eway\EwayRapid\Gateway\Response\UpdateTokenHandler" />
+
+    <!-- Response Validator -->
+    <virtualType name="EwayRapidPaymentActionValidator" type="\Eway\EwayRapid\Gateway\Validator\PaymentActionsValidator" />
+    <virtualType name="EwayRapidCreateTokenValidator" type="\Eway\EwayRapid\Gateway\Validator\CreateTokenValidator" />
+
+    <type name="\Eway\EwayRapid\Plugin\StateCommandPlugin">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Block\Mycards\Listing">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Cron\VerifyOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">EwayRapidCronLogger</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Model\Customer\Token\Manager">
+        <arguments>
+            <argument name="customerProvider" xsi:type="object">\Eway\EwayRapid\Model\Customer\Adminhtml\Provider</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Model\Version">
+        <arguments>
+            <argument name="components" xsi:type="array">
+                <item name="Eway_EwayRapid" xsi:type="string">Base</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Block\Info\Cc">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+</config>

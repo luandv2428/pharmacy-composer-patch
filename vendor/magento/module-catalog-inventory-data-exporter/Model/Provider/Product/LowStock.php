@@ -15,6 +15,9 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Product low stock data provider
+ */
 class LowStock
 {
     /**
@@ -38,7 +41,6 @@ class LowStock
     private $scopeConfig;
 
     /**
-     * OnlyXLeft constructor.
      * @param ResourceConnection $resourceConnection
      * @param CatalogInventoryQuery $catalogInventoryQuery
      * @param LoggerInterface $logger
@@ -57,6 +59,8 @@ class LowStock
     }
 
     /**
+     * Format output
+     *
      * @param array $row
      * @param array $thresholds
      * @return array
@@ -78,6 +82,8 @@ class LowStock
     }
 
     /**
+     * Get provider data
+     *
      * @param array $values
      * @return array
      * @throws UnableRetrieveData
@@ -100,12 +106,14 @@ class LowStock
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve stock data'));
+            throw new UnableRetrieveData('Unable to retrieve stock data');
         }
         return $output;
     }
 
     /**
+     * Get threshold amount
+     *
      * @param array $storeViewCodes
      * @return array
      */

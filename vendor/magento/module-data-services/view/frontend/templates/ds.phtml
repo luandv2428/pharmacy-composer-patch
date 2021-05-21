@@ -24,7 +24,8 @@
     {
         "*": {
             "dataServicesBase": {
-                "isCookieRestrictionModeEnabled": <?= (int)$block->isCookieRestrictionModeEnabled() ?>
+                "isCookieRestrictionModeEnabled": <?= (int) $block->isCookieRestrictionModeEnabled() ?>,
+                "isEnabled": <?= (int) $block->isEnabled() ?>
             }
         }
     }

@@ -10,6 +10,8 @@
         <magento_saas>
             <routes>
                 <products>catalogfeed/v2/products</products>
+                <productAttributes>feeds/metadata/v2/metadata</productAttributes>
+                <categories>catalogfeed/v2/categories</categories>
             </routes>
         </magento_saas>
     </default>

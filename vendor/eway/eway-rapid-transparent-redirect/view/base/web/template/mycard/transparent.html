@@ -1,0 +1,98 @@
+<style>
+       .select-month-wrapper, .select-year-wrapper {width: 45%;}
+       .select-month-wrapper {float: left;}
+       .select-year-wrapper {float: right;}
+</style>
+<div data-bind="afterRender: loadScript" class="fieldset">
+       <div class="field required">
+              <label class="label" for="ewayrapid_cc_name">
+                     <span>Card Name</span>
+              </label>
+              <div class="control">
+                     <input type="text" name="EWAY_CARDNAME" class="input-text" value=""
+                            data-bind="attr: {
+                                    autocomplete: off,
+                                    id: 'ewayrapid_cc_name',
+                                    title: $t('Credit Card Name'),
+                                    'data-container': 'ewayrapid-cc-name',
+                                    'data-validate': JSON.stringify({'required':true})
+                                },
+                                enable: showFullCard,
+                                value: creditCardName"/>
+
+              </div>
+       </div>
+
+       <div class="field required">
+              <label class="label" for="ewayrapid_cc_number">
+                     <span>Card Number</span>
+              </label>
+              <div class="control" data-bind="visible: !isEditing()">
+                     <input type="text" name="EWAY_CARDNUMBER" class="input-text" value=""
+                            data-bind="attr: {
+                                    autocomplete: off,
+                                    id: 'ewayrapid_cc_number',
+                                    title: $t('Credit Card Number'),
+                                    'data-container': 'ewayrapid-cc-number',
+                                    'data-validate': JSON.stringify({
+                                        'required-number':true,
+                                        'validate-card-type':getCcAvailableTypesValues(),
+                                        'validate-card-number':'#ewayrapid_cc_type'
+                                    })
+                              },
+                              enable: showFullCard() && !isEditing(),
+                              value: creditCardNumber,
+                              valueUpdate: 'keyup' "/>
+              </div>
+              <div class="control" data-bind="visible: isEditing()">
+                     <strong><span data-bind="text: getSelectedCardNumber()"></span></strong>
+                     <div><span>(To use a new credit card number, please add another card)</span></div>
+              </div>
+       </div>
+
+       <div class="field required">
+              <label class="label" for="ewayrapid_expiration">
+                     <span>Card Expiry</span>
+              </label>
+              <div class="control">
+                     <div class="select-month-wrapper">
+                            <select  name="EWAY_CARDEXPIRYMONTH"
+                                     class="select select-month"
+                                     data-bind="attr: {
+                                        id: 'ewayrapid_expiration',
+                                        'data-container': 'ewayrapid-cc-month',
+                                        'data-validate': JSON.stringify({
+                                            required:true,
+                                            'validate-cc-exp':'#ewayrapid_expiration_yr'
+                                        })
+                                    },
+                                    enable: showFullCard,
+                                    options: getCcMonthsValues(),
+                                    optionsValue: 'value',
+                                    optionsText: 'month',
+                                    optionsCaption: $t('Month'),
+                                    value: creditCardExpMonth">
+                            </select>
+                     </div>
+                     <div class="select-year-wrapper">
+                            <select name="EWAY_CARDEXPIRYYEAR"
+                                    class="select select-year"
+                                    data-bind="attr: {
+                                        id: 'ewayrapid_expiration_yr',
+                                        'data-container': 'ewayrapid-cc-year',
+                                        'data-validate': JSON.stringify({required:true})
+                                    },
+                                    enable: showFullCard,
+                                    options: getCcYearsValues(),
+                                    optionsValue: 'value',
+                                    optionsText: 'year',
+                                    optionsCaption: $t('Year'),
+                                    value: creditCardExpYear">
+                            </select>
+                     </div>
+              </div>
+       </div>
+
+       <input type="hidden" name="EWAY_ACCESSCODE" data-bind="value: accessCode()" />
+       <input type="hidden" name="EWAY_PAYMENTTYPE" value="Credit Card" />
+</div>

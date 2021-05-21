@@ -7,6 +7,11 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\FormatterInterface" type="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\Formatter" />
+    <preference for="Magento\CatalogDataExporter\Model\Indexer\ProductIndexerCallbackInterface" type="Magento\CatalogDataExporter\Model\Indexer\EmptyIndexerCallback" />
+    <preference for="Magento\CatalogDataExporter\Model\Indexer\CategoryIndexerCallbackInterface" type="Magento\CatalogDataExporter\Model\Indexer\EmptyIndexerCallback" />
+    <preference for="Magento\CatalogDataExporter\Model\Provider\Category\Formatter\FormatterInterface" type="Magento\CatalogDataExporter\Model\Provider\Category\Formatter\Formatter" />
+    <preference for="Magento\CatalogDataExporter\Model\Query\Eav\EavAttributeQueryBuilderInterface" type="Magento\CatalogDataExporter\Model\Query\Eav\EavAttributeQueryBuilder" />
+
     <type name="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\Formatter">
         <arguments>
             <argument name="formatters" xsi:type="array">
@@ -14,6 +19,7 @@
                 <item name="systemEnums" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\SystemEnumFormatter</item>
                 <item name="taxClass" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\TaxClassFormatter</item>
                 <item name="scopes" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\ScopeFormatter</item>
+                <item name="description" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\DescriptionFormatter</item>
             </argument>
         </arguments>
     </type>
@@ -33,9 +39,15 @@
             </argument>
         </arguments>
     </type>
-    <type name="Magento\CatalogDataExporter\Model\Query\MainProductQuery">
+
+    <type name="Magento\CatalogDataExporter\Model\Query\ProductMainQuery">
         <arguments>
             <argument name="mainTable" xsi:type="string">catalog_product_entity</argument>
+        </arguments>
+    </type>
+    <virtualType name="ProductEavAttributesProvider" type="Magento\CatalogDataExporter\Model\Provider\EavAttributes\EavAttributesProvider">
+        <arguments>
+            <argument name="queryBuilder" xsi:type="object">Magento\CatalogDataExporter\Model\Query\Eav\ProductAttributeQueryBuilder</argument>
             <argument name="includeAttributes" xsi:type="array">
                 <item name="description" xsi:type="string">description</item>
                 <item name="image" xsi:type="string">image</item>
@@ -59,6 +71,278 @@
                 <item name="visibility" xsi:type="string">visibility</item>
                 <item name="weight" xsi:type="string">weight</item>
                 <item name="weight_type" xsi:type="string">weight_type</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogDataExporter\Model\Provider\Products">
+        <arguments>
+            <argument name="eavAttributesProvider" xsi:type="object">ProductEavAttributesProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogDataExporter\Model\Provider\Category\Formatter\Formatter">
+        <arguments>
+            <argument name="formatters" xsi:type="array">
+                <item name="output" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Category\Formatter\Output</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogDataExporter\Model\Provider\Category\Formatter\Output">
+        <arguments>
+            <argument name="attributes" xsi:type="array">
+                <item name="description" xsi:type="string">description</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogDataExporter\Model\Query\CategoryMainQuery">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">catalog_category_entity</argument>
+        </arguments>
+    </type>
+    <virtualType name="CategoryEavAttributesProvider" type="Magento\CatalogDataExporter\Model\Provider\EavAttributes\EavAttributesProvider">
+        <arguments>
+            <argument name="queryBuilder" xsi:type="object">Magento\CatalogDataExporter\Model\Query\Eav\CategoryAttributeQueryBuilder</argument>
+            <argument name="includeAttributes" xsi:type="array">
+                <item name="is_active" xsi:type="string">is_active</item>
+                <item name="is_anchor" xsi:type="string">is_anchor</item>
+                <item name="display_mode" xsi:type="string">display_mode</item>
+                <item name="meta_title" xsi:type="string">meta_title</item>
+                <item name="meta_keywords" xsi:type="string">meta_keywords</item>
+                <item name="meta_description" xsi:type="string">meta_description</item>
+                <item name="name" xsi:type="string">name</item>
+                <item name="description" xsi:type="string">description</item>
+                <item name="url_key" xsi:type="string">url_key</item>
+                <item name="children_count" xsi:type="string">children_count</item>
+                <item name="url_path" xsi:type="string">url_path</item>
+                <item name="default_sort_by" xsi:type="string">default_sort_by</item>
+                <item name="available_sort_by" xsi:type="string">available_sort_by</item>
+                <item name="image" xsi:type="string">image</item>
+                <item name="include_in_menu" xsi:type="string">include_in_menu</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogDataExporter\Model\Provider\Categories">
+        <arguments>
+            <argument name="eavAttributesProvider" xsi:type="object">CategoryEavAttributesProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogDataExporter\Model\Provider\Product\Options">
+        <arguments>
+            <argument name="optionProviders" xsi:type="array">
+                <item name="options" xsi:type="object">
+                    Magento\CatalogDataExporter\Model\Provider\Product\CustomizableOptions\SelectableOptions
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogDataExporter\Model\Provider\Product\CustomizableOptions\EnteredOptions">
+        <arguments>
+            <argument name="optionTypes" xsi:type="array">
+                <item name="field" xsi:type="string">field</item>
+                <item name="area" xsi:type="string">area</item>
+                <item name="file" xsi:type="string">file</item>
+                <item name="date" xsi:type="string">date</item>
+                <item name="time" xsi:type="string">time</item>
+                <item name="date_time" xsi:type="string">date_time</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogDataExporter\Model\Provider\Product\CustomizableOptions\SelectableOptions">
+        <arguments>
+            <argument name="optionTypes" xsi:type="array">
+                <item name="drop_down" xsi:type="string">drop_down</item>
+                <item name="radio" xsi:type="string">radio</item>
+                <item name="checkbox" xsi:type="string">checkbox</item>
+                <item name="multiple" xsi:type="string">multiple</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Category">
+        <plugin name="reindex_category_feed_on_save" type="Magento\CatalogDataExporter\Plugin\Category\ReindexCategoryFeedOnSave"/>
+    </type>
+    <!-- Indexer & metadata declaration -->
+    <!-- Products feed -->
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\ProductFeedIndexMetadata" type="Magento\DataExporter\Model\Indexer\FeedIndexMetadata">
+        <arguments>
+            <argument name="feedName" xsi:type="string">products</argument>
+            <argument name="feedIdentity" xsi:type="string">productId</argument>
+            <argument name="sourceTableName" xsi:type="string">catalog_product_entity</argument>
+            <argument name="sourceTableField" xsi:type="string">entity_id</argument>
+            <argument name="feedTableName" xsi:type="string">catalog_data_exporter_products</argument>
+            <argument name="feedTableField" xsi:type="string">id</argument>
+            <argument name="feedTableMutableColumns" xsi:type="array">
+                <item name="feed_data" xsi:type="string">feed_data</item>
+                <item name="is_deleted" xsi:type="string">is_deleted</item>
+                <item name="sku" xsi:type="string">sku</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\ProductDataSerializer" type="Magento\DataExporter\Model\Indexer\DataSerializer">
+        <arguments>
+            <argument name="mapping" xsi:type="array">
+                <item name="sku" xsi:type="string">sku</item>
+                <item name="id" xsi:type="string">productId</item>
+                <item name="store_view_code" xsi:type="string">storeViewCode</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogDataExporter\Model\Indexer\ProductFeedIndexer">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductFeedIndexMetadata</argument>
+            <argument name="serializer" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductDataSerializer</argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\CatalogDataExporter\Model\ProductFeed" type="Magento\DataExporter\Model\Feed">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <!-- Attributes feed -->
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndexMetadata" type="Magento\DataExporter\Model\Indexer\FeedIndexMetadata">
+        <arguments>
+            <argument name="feedName" xsi:type="string">productAttributes</argument>
+            <argument name="feedIdentity" xsi:type="string">id</argument>
+            <argument name="sourceTableName" xsi:type="string">eav_attribute</argument>
+            <argument name="sourceTableField" xsi:type="string">attribute_id</argument>
+            <argument name="feedTableName" xsi:type="string">catalog_data_exporter_product_attributes</argument>
+            <argument name="feedTableField" xsi:type="string">id</argument>
+            <argument name="feedTableMutableColumns" xsi:type="array">
+                <item name="feed_data" xsi:type="string">feed_data</item>
+                <item name="is_deleted" xsi:type="string">is_deleted</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\ProductAttributeDataSerializer" type="Magento\DataExporter\Model\Indexer\DataSerializer">
+        <arguments>
+            <argument name="mapping" xsi:type="array">
+                <item name="id" xsi:type="string">id</item>
+                <item name="store_view_code" xsi:type="string">storeViewCode</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndex" type="Magento\DataExporter\Model\Indexer\FeedIndexer">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndexMetadata</argument>
+            <argument name="serializer" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductAttributeDataSerializer</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\BooleanMetadataFormatter"
+                 type="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\BooleanNumericMetadataFormatter">
+        <arguments>
+            <argument name="type" xsi:type="string">boolean</argument>
+            <argument name="attributeCodes" xsi:type="array">
+                <item name="is_redeemable" xsi:type="string">is_redeemable</item>
+                <item name="use_config_is_redeemable" xsi:type="string">use_config_is_redeemable</item>
+                <item name="use_config_lifetime" xsi:type="string">use_config_lifetime</item>
+                <item name="use_config_email_template" xsi:type="string">use_config_email_template</item>
+                <item name="use_config_allow_message" xsi:type="string">use_config_allow_message</item>
+                <item name="allow_message" xsi:type="string">allow_message</item>
+                <item name="has_options" xsi:type="string">has_options</item>
+            </argument>
+            <argument name="backendTypes" xsi:type="array">
+                <item name="int" xsi:type="string">int</item>
+            </argument>
+            <argument name="frontendInput" xsi:type="array">
+                <item name="boolean" xsi:type="string">boolean</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\NumericMetadataFormatter"
+                 type="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\BooleanNumericMetadataFormatter">
+        <arguments>
+            <argument name="type" xsi:type="string">numeric</argument>
+            <argument name="attributeCodes" xsi:type="array">
+                <item name="required_options" xsi:type="string">required_options</item>
+            </argument>
+            <argument name="frontendInput" xsi:type="array">
+                <item name="price" xsi:type="string">price</item>
+                <item name="weight" xsi:type="string">weight</item>
+                <item name="text" xsi:type="string">text</item>
+            </argument>
+            <argument name="backendTypes" xsi:type="array">
+                <item name="decimal" xsi:type="string">decimal</item>
+                <item name="int" xsi:type="string">int</item>
+            </argument>
+            <argument name="validations" xsi:type="array">
+                <item name="validate-number" xsi:type="string">validate-number</item>
+                <item name="validate-digits" xsi:type="string">validate-digits</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\MetadataFormatter"
+                 type="Magento\CatalogDataExporter\Model\Provider\Product\Formatter\Formatter">
+        <arguments>
+            <argument name="formatters" xsi:type="array">
+                <item name="scopes" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\ScopeFormatter</item>
+                <item name="boolean" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\BooleanMetadataFormatter</item>
+                <item name="numeric" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\NumericMetadataFormatter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\CatalogDataExporter\Model\Provider\ProductMetadata">
+        <arguments>
+            <argument name="formatter" xsi:type="object">Magento\CatalogDataExporter\Model\Provider\Product\Formatter\MetadataFormatter</argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\CatalogDataExporter\Model\ProductMetadataFeed" type="Magento\DataExporter\Model\Feed">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <!-- Categories feed -->
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexMetadata" type="Magento\DataExporter\Model\Indexer\FeedIndexMetadata">
+        <arguments>
+            <argument name="feedName" xsi:type="string">categories</argument>
+            <argument name="feedIdentity" xsi:type="string">categoryId</argument>
+            <argument name="sourceTableName" xsi:type="string">catalog_category_entity</argument>
+            <argument name="sourceTableField" xsi:type="string">entity_id</argument>
+            <argument name="feedTableName" xsi:type="string">catalog_data_exporter_categories</argument>
+            <argument name="feedTableField" xsi:type="string">id</argument>
+            <argument name="feedTableMutableColumns" xsi:type="array">
+                <item name="feed_data" xsi:type="string">feed_data</item>
+                <item name="is_deleted" xsi:type="string">is_deleted</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\CatalogDataExporter\Model\Indexer\CategoryDataSerializer" type="Magento\DataExporter\Model\Indexer\DataSerializer">
+        <arguments>
+            <argument name="mapping" xsi:type="array">
+                <item name="id" xsi:type="string">categoryId</item>
+                <item name="store_view_code" xsi:type="string">storeViewCode</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexer">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexMetadata</argument>
+            <argument name="serializer" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\CategoryDataSerializer</argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\CatalogDataExporter\Model\CategoryFeed" type="Magento\DataExporter\Model\Feed">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\DataExporter\Model\FeedPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="products" xsi:type="string">Magento\CatalogDataExporter\Model\ProductFeed</item>
+                <item name="productAttributes" xsi:type="string">Magento\CatalogDataExporter\Model\ProductMetadataFeed</item>
+                <item name="categories" xsi:type="string">Magento\CatalogDataExporter\Model\CategoryFeed</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Setup\Declaration\Schema\Operations\AddColumn">
+        <arguments>
+            <argument name="triggers" xsi:type="array">
+                <item name="migrateDataFromJSON" xsi:type="object">Magento\CatalogDataExporter\Plugin\DDLTrigger\MigrateDataFromJSON</item>
             </argument>
         </arguments>
     </type>

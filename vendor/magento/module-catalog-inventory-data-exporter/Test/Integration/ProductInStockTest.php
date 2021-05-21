@@ -15,29 +15,12 @@ use Magento\TestFramework\Helper\Bootstrap;
 
 class ProductInStockTest extends AbstractProductTestHelper
 {
-
-    /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_is_in_stock.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_is_in_stock_rollback.php';
-    }
-
     /**
      * Validate inStock status
      *
      * @magentoDbIsolation disabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture Magento/CatalogInventoryDataExporter/_files/setup_is_in_stock.php
      *
      * @return void
      * @throws NoSuchEntityException

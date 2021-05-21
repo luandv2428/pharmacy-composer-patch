@@ -7,48 +7,32 @@ declare(strict_types=1);
 
 namespace Magento\CatalogDataExporter\Model\Provider\Product\Formatter;
 
-use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Catalog\Model\Product\Image\ParamsBuilder;
-use Magento\Catalog\Model\View\Asset\ImageFactory;
-use Magento\Framework\App\State;
-use Magento\Framework\View\ConfigInterface;
-use Magento\Framework\View\DesignLoader;
+use Magento\Catalog\Model\Product\Media\ConfigInterface as MediaConfig;
+use Magento\DataExporter\Exception\UnableRetrieveData;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Class ImageFormatter
+ * Image formatter for product provider
  */
-class ImageFormatter
+class ImageFormatter implements FormatterInterface
 {
-    /**
-     * @var ImageFactory
-     */
-    private $imageFactory;
-
-    /**
-     * @var ConfigInterface
-     */
-    private $presentationConfig;
-
-    /**
-     * @var ParamsBuilder
-     */
-    private $imageParamsBuilder;
-
     /**
      * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var DesignLoader
+     * @var MediaConfig
      */
-    private $designLoader;
+    private $mediaConfig;
 
     /**
-     * @var State
+     * @var LoggerInterface
      */
-    private $appState;
+    private $logger;
 
     /**
      * @var array
@@ -56,36 +40,30 @@ class ImageFormatter
     private $images;
 
     /**
-     * ImageFieldFormatter constructor.
-     *
-     * @param ImageFactory $imageFactory
-     * @param ConfigInterface $presentationConfig
-     * @param ParamsBuilder $imageParamsBuilder
+     * @var string[]
+     */
+    private $baseMediaUrlCache;
+
+    /**
      * @param StoreManagerInterface $storeManager
-     * @param DesignLoader $designLoader
-     * @param State $appState
+     * @param MediaConfig $mediaConfig
+     * @param LoggerInterface $logger
      * @param array $images
      */
     public function __construct(
-        ImageFactory $imageFactory,
-        ConfigInterface $presentationConfig,
-        ParamsBuilder $imageParamsBuilder,
         StoreManagerInterface $storeManager,
-        DesignLoader $designLoader,
-        State $appState,
+        MediaConfig $mediaConfig,
+        LoggerInterface $logger,
         array $images = [
-            'image' => 'product_base_image',
-            'smallImage' => 'product_small_image',
-            'thumbnail' => 'product_thumbnail_image',
-            'swatchImage' => 'product_swatch_image_small'
+            'image',
+            'smallImage',
+            'thumbnail',
+            'swatchImage',
         ]
     ) {
-        $this->imageFactory = $imageFactory;
-        $this->presentationConfig = $presentationConfig;
-        $this->imageParamsBuilder = $imageParamsBuilder;
         $this->storeManager = $storeManager;
-        $this->designLoader = $designLoader;
-        $this->appState = $appState;
+        $this->mediaConfig = $mediaConfig;
+        $this->logger = $logger;
         $this->images = $images;
     }
 
@@ -93,57 +71,50 @@ class ImageFormatter
      * Format provider data
      *
      * @param array $row
+     *
      * @return array
-     * @throws \Exception
+     *
+     * @throws UnableRetrieveData
      */
     public function format(array $row) : array
     {
-        $actualStoreCode = $this->storeManager->getStore()->getCode();
-        $this->storeManager->setCurrentStore($row['storeViewCode']);
         try {
-            foreach ($this->images as $imageKey => $imageValue) {
-                if (isset($row[$imageKey])) {
-                    $imageUrl = $this->appState->emulateAreaCode(
-                        'frontend',
-                        [$this, "getImageUrl"],
-                        [$row[$imageKey], $imageValue]
-                    );
-
-                    $row[$imageKey] = [
-                        'url' => $imageUrl,
-                        'label' => isset($row[$imageKey . '_label']) ? $row[$imageKey . '_label'] : null
+            foreach ($this->images as $image) {
+                if (isset($row[$image])) {
+                    $row[$image . '_default'] = $row[$image];
+                    $row[$image] = [
+                        'url' => $this->getBaseMediaUrlByStoreViewCode($row['storeViewCode']) . $row[$image],
+                        'label' => $row[$image . 'Label'] ?? null,
                     ];
                 }
             }
-        } finally {
-            $this->storeManager->setCurrentStore($actualStoreCode);
+        } catch (\Throwable $exception) {
+            $this->logger->error($exception->getMessage());
+            throw new UnableRetrieveData('Unable to retrieve product formatted image data');
         }
+
         return $row;
     }
 
     /**
-     * Get the product image url for a given image type
+     * Get base media url by store view code
      *
-     * @param string $path
-     * @param string $type
+     * @param string $storeViewCode
+     *
      * @return string
+     *
+     * @throws NoSuchEntityException
      */
-    public function getImageUrl(string $path, string $type) : string
+    private function getBaseMediaUrlByStoreViewCode(string $storeViewCode) : string
     {
-        $this->designLoader->load();
-        $viewImageConfig = $this->presentationConfig->getViewConfig()->getMediaAttributes(
-            'Magento_Catalog',
-            ImageHelper::MEDIA_TYPE_CONFIG_NODE,
-            $type
-        );
-        $imageMiscParams = $this->imageParamsBuilder->build($viewImageConfig);
-        $asset = $this->imageFactory->create(
-            [
-                'miscParams' => $imageMiscParams,
-                'filePath' => $path
-            ]
-        );
-        $url = preg_replace('#^http(s)?:#', '', $asset->getUrl());
-        return $url;
+        if (!isset($this->baseMediaUrlCache[$storeViewCode])) {
+            $this->baseMediaUrlCache[$storeViewCode] = \sprintf(
+                '%s%s',
+                $this->storeManager->getStore($storeViewCode)->getBaseUrl(UrlInterface::URL_TYPE_MEDIA),
+                $this->mediaConfig->getBaseMediaPath()
+            );
+        }
+
+        return $this->baseMediaUrlCache[$storeViewCode];
     }
 }

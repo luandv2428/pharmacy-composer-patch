@@ -98,7 +98,7 @@ class Prices
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve price data'));
+            throw new UnableRetrieveData('Unable to retrieve price data');
         }
         return $output;
     }

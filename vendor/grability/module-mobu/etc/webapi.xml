@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Grability
+ *
+ * @category            Grability
+ * @package             Grability_Mobu
+ * @copyright           Copyright (c) Grability (https://www.grability.com/)
+ * @termsAndConditions  https://www.grability.com/legal
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<route method="POST" url="/V1/customers/addresses">
+		<service class="Grability\Mobu\Api\PostManagementInterface" method="createAddress"/>
+		<resources>
+			<resource ref="self"/>
+        	</resources>
+        	<data>
+        		<parameter name="customerId" force="true">%customer_id%</parameter>
+        	</data>
+	</route>
+	<route method="GET" url="/V1/products/configurations/:sku">
+	        <service class="Grability\Mobu\Api\GetManagementInterface" method="getProductConfigurations"/>
+	        <resources>
+	                <resource ref="self"/>
+	        </resources>
+	</route>
+	<route method="GET" url="/V1/products/best-selling/:period">
+	        <service class="Grability\Mobu\Api\GetManagementInterface" method="getBestSellingProducts"/>
+	        <resources>
+	                <resource ref="self"/>
+	        </resources>
+	</route>
+	<route method="GET" url="/V1/sales/minimum-order-amount">
+	        <service class="Grability\Mobu\Api\GetManagementInterface" method="getMinimiumOrderAmount"/>
+	        <resources>
+	                <resource ref="self"/>
+	        </resources>
+	</route>
+	<route method="GET" url="/V1/products/parent/:sku">
+		<service class="Grability\Mobu\Api\GetManagementInterface" method="getProductParent"/>
+		<resources>
+			<resource ref="self"/>
+		</resources>
+	</route>
+</routes>

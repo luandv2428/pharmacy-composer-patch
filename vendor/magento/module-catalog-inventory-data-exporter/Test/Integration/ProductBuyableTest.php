@@ -17,7 +17,7 @@ use Magento\TestFramework\Helper\Bootstrap;
 /**
  * Product buyable flag test
  *
- * @magentoDataFixture loadFixture
+ * @magentoDataFixture Magento/CatalogInventoryDataExporter/_files/setup_buyable_product.php
  * @magentoDbIsolation disabled
  * @magentoAppIsolation enabled
  */
@@ -28,22 +28,6 @@ class ProductBuyableTest extends AbstractProductTestHelper
      */
     const SKU = 'simple7';
     const STORE_VIEW_CODE = 'default';
-
-    /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_buyable_product.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_buyable_product_rollback.php';
-    }
 
     /**
      * Validate buyable status of out of stock product

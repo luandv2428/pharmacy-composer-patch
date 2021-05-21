@@ -29,8 +29,7 @@ interface ServiceClientInterface
      *
      * @param string $version
      * @param string $uri
-     * @param string $storeViewCode
      * @return string
      */
-    public function getUrl(string $version, string $uri, string $storeViewCode) : string;
+    public function getUrl(string $version, string $uri) : string;
 }

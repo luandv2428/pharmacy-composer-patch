@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <ewayrapid>
+                <field_styles>
+                    <![CDATA[line-height: 1; height: 28px; border: 1px solid #AAA; color: #000; padding: 2px;]]>
+                </field_styles>
+            </ewayrapid>
+        </payment>
+    </default>
+</config>

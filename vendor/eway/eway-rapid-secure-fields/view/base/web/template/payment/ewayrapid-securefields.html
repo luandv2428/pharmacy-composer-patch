@@ -1,0 +1,75 @@
+<style>
+    @media screen and (min-width: 768px) {
+        .token-list, .securefields-wrapper, .mage-error-eway {width: 50%;}
+    }
+    .securefields-wrapper {height: 2em;}
+    .securefields-title {margin-top: 15px;}
+</style>
+
+<!-- ko if: isTokenEnabled() -->
+    <div class="field-token-list admin__field">
+        <div class="admin__field-control">
+            <select class="token-list"
+                    data-bind=" options:        tokenList,
+                                optionsText:    'card',
+                                value:          selectedToken,
+                                optionsCaption: 'Use a new card'"></select>
+
+            <!-- ko if: canEditToken() -->
+                <button type="button" title="Edit saved card" class="action primary"
+                        data-bind="visible: !isEditing(), click: editToken"><span>Edit</span></button>
+
+                <button type="button" title="Cancel" class="action cancel"
+                        data-bind="visible: isEditing(), click: cancelEditToken"><span>Cancel Edit</span></button>
+            <!-- /ko -->
+        </div>
+    </div>
+<!-- /ko -->
+
+    <div class="field-type admin__field _required" data-bind="afterRender: loadScript, visible: showFullCard">
+        <label class="admin__field-label" for="eway-secure-field-name">
+            <span>Card Name</span>
+        </label>
+        <div class="admin__field-control">
+            <div id="eway-secure-field-name" class="securefields-wrapper"></div>
+            <label for="eway-secure-field-name" style="display: none;" generated="true" class="mage-error mage-error-eway" id="eway-secure-field-name-error">Invalid card name.</label>
+        </div>
+    </div>
+
+    <div class="field-number admin__field _required" data-bind="visible: showFullCard">
+        <label class="admin__field-label" for="eway-secure-field-card">
+            <span>Card Number</span>
+        </label>
+        <div class="admin__field-control" data-bind="visible: !isEditing()">
+            <div id="eway-secure-field-card" class="securefields-wrapper"></div>
+            <label for="eway-secure-field-card" style="display: none;" generated="true" class="mage-error mage-error-eway" id="eway-secure-field-card-error">Invalid card number.</label>
+        </div>
+        <div class="admin__field-control" data-bind="visible: isEditing()">
+            <strong><span data-bind="text: getSelectedCardNumber()"></span></strong>
+            <div><span>(To use a new credit card number, please add another card)</span></div>
+        </div>
+    </div>
+
+    <div class="field-date admin__field _required" data-bind="visible: showFullCard">
+        <label class="admin__field-label" for="eway-secure-field-expiry">
+            <span>Card Expiry</span>
+        </label>
+        <div class="admin__field-control">
+            <div id="eway-secure-field-expiry" class="securefields-wrapper"></div>
+            <label for="eway-secure-field-expiry" style="display: none;" generated="true" class="mage-error mage-error-eway" id="eway-secure-field-expiry-error">Invalid card expiry.</label>
+        </div>
+    </div>
+
+<!-- ko if: isTokenEnabled() -->
+    <div class="field-token-list admin__field" data-bind="visible: !selectedToken()">
+        <div class="admin__field-control">
+            <input type="checkbox" id="save_card" class="checkbox" data-bind="checked: saveCard"/>
+            <label for="save_card" class="label"><span data-bind="text: getSaveText()"></span></label>
+        </div>
+    </div>
+    <input type="hidden" id="ewayrapid_token_id" name="payment[additional_information][TokenID]" value="" />
+    <input type="hidden" id="ewayrapid_token_action" name="payment[additional_information][TokenAction]" value="" />
+<!-- /ko -->
+
+<input type="hidden" id="secured_card_data" name="payment[additional_information][SecuredCardData]" value="" />
+<input type="hidden" name="ewayrapid_create_from_admin" value="1" />

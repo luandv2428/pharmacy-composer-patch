@@ -34,7 +34,6 @@
         </arguments>
     </type>
     <preference for="Magento\DataExporter\Config\ConfigInterface" type="Magento\DataExporter\Config\Config" />
-    <preference for="Magento\DataExporter\Http\ConverterInterface" type="Magento\DataExporter\Http\Converter\JsonConverter" />
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
             <argument name="environment" xsi:type="array">

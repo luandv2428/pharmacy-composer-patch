@@ -15,29 +15,12 @@ use Magento\TestFramework\Helper\Bootstrap;
 
 class ProductLowStockTest extends AbstractProductTestHelper
 {
-
-    /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_is_low_stock.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_is_low_stock_rollback.php';
-    }
-
     /**
      * Validate lowStock status
      *
      * @magentoDbIsolation disabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture Magento/CatalogInventoryDataExporter/_files/setup_is_low_stock.php
      * @magentoConfigFixture current_store cataloginventory/options/stock_threshold_qty 20
      * @return void
      * @throws NoSuchEntityException

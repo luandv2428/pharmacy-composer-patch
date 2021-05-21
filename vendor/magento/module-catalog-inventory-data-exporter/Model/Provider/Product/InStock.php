@@ -12,6 +12,9 @@ use Magento\DataExporter\Exception\UnableRetrieveData;
 use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Product in stock data provider
+ */
 class InStock
 {
     /**
@@ -30,7 +33,6 @@ class InStock
     private $catalogInventoryQuery;
 
     /**
-     * Stock constructor.
      * @param ResourceConnection $resourceConnection
      * @param CatalogInventoryQuery $catalogInventoryQuery
      * @param LoggerInterface $logger
@@ -46,6 +48,8 @@ class InStock
     }
 
     /**
+     * Format output
+     *
      * @param array $row
      * @return array
      */
@@ -60,6 +64,8 @@ class InStock
     }
 
     /**
+     * Get provider data
+     *
      * @param array $values
      * @return array
      * @throws UnableRetrieveData
@@ -81,7 +87,7 @@ class InStock
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve stock data'));
+            throw new UnableRetrieveData('Unable to retrieve stock data');
         }
         return $output;
     }

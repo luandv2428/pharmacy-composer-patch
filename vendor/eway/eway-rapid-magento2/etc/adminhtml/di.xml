@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="\Eway\EwayRapid\Model\Customer\Token\Manager">
+        <arguments>
+            <argument name="customerProvider" xsi:type="object">\Eway\EwayRapid\Model\Customer\Adminhtml\Provider</argument>
+        </arguments>
+    </type>
+    <type name="\Magento\Sales\Model\Order\Payment\State\CommandInterface">
+        <plugin name="ewayrapid-fix-order-status" type="\Eway\EwayRapid\Plugin\StateCommandPluginAdmin"/>
+    </type>
+    <type name="\Eway\EwayRapid\Plugin\StateCommandPluginAdmin">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Gateway\Request\BaseRequestDataBuilder">
+        <arguments>
+            <argument name="transactionType" xsi:type="const">\Eway\EwayRapid\Model\Config::MOTO</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Block\Adminhtml\Mycard">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Controller\Adminhtml\AbstractMyCards">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayOrderColectionJoinedOrderTable" type="\Eway\EwayRapid\Model\ResourceModel\Order\Collection">
+        <arguments>
+            <argument name="joinOrderTable" xsi:type="string">true</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Sales\Controller\Adminhtml\Order\Invoice\Capture">
+        <plugin name="ewayrapid-invoice-capture" type="\Eway\EwayRapid\Plugin\InvoiceCapturePlugin" />
+    </type>
+</config>

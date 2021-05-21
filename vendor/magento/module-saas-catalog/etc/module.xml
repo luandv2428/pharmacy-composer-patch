@@ -10,6 +10,8 @@
         <sequence>
             <module name="Magento_DataExporter"/>
             <module name="Magento_CatalogDataExporter"/>
+            <module name="Magento_ServicesConnector"/>
+            <module name="Magento_ServicesId"/>
         </sequence>
     </module>
 </config>

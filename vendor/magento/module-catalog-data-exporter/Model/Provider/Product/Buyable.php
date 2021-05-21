@@ -10,7 +10,7 @@ namespace Magento\CatalogDataExporter\Model\Provider\Product;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
- * Class Buyable
+ * Is product buyable data provider
  */
 class Buyable
 {

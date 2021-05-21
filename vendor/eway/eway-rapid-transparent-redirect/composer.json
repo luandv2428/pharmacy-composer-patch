@@ -1,0 +1,22 @@
+{
+  "name": "eway/eway-rapid-transparent-redirect",
+  "description": "Provide Transparent Redirect method for eWAY Rapid Payment Module for Magento 2",
+  "homepage": "https://www.eway.com.au",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "eWAY",
+      "homepage": "https://www.eway.com.au"
+    }
+  ],
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Eway\\TransparentRedirect\\": ""
+    }
+  }
+}

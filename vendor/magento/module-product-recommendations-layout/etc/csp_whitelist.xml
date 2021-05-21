@@ -16,6 +16,7 @@
         <policy id="connect-src">
             <values>
                 <value id="recommendations_api_gateway" type="host">api.magento.com</value>
+                <value id="recommendations_adobe_io" type="host">commerce.adobe.io</value>
             </values>
         </policy>
     </policies>

@@ -24,8 +24,6 @@ class Config implements ConfigInterface
     ];
 
     /**
-     * Config constructor.
-     *
      * @param DataInterface $data
      */
     public function __construct(

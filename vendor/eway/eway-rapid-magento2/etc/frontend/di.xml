@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="ewayrapid" xsi:type="object">\Eway\EwayRapid\Model\Ui\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Model\Customer\Token\Manager">
+        <arguments>
+            <argument name="customerProvider" xsi:type="object">\Eway\EwayRapid\Model\Customer\Frontend\Provider</argument>
+        </arguments>
+    </type>
+    <type name="\Magento\Sales\Model\Order\Payment\State\CommandInterface">
+        <plugin name="ewayrapid-fix-order-status" type="\Eway\EwayRapid\Plugin\StateCommandPlugin"/>
+    </type>
+
+    <type name="\Eway\EwayRapid\Controller\AbstractMycards">
+        <plugin name="authentication" type="\Magento\Sales\Controller\Order\Plugin\Authentication"/>
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="\Eway\EwayRapid\Block\Mycards\Link">
+        <arguments>
+            <argument name="config" xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Url\SecurityInfo">
+        <arguments>
+            <argument name="secureUrlList" xsi:type="array">
+                <item name="ewayrapid_secure_url" xsi:type="string">/ewayrapid/</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="\Magento\Checkout\Controller\Index\Index">
+        <plugin name="ewayrapid_fraud_check" type="\Eway\EwayRapid\Plugin\CheckoutBlockPlugin"/>
+    </type>
+</config>

@@ -11,6 +11,14 @@
                provider="Magento\CatalogDataExporter\Model\Provider\Products">
             <using field="product_id" />
         </field>
+        <field name="categories" type="Category" repeated="true"
+               provider="Magento\CatalogDataExporter\Model\Provider\Categories">
+            <using field="category_id" />
+        </field>
+        <field name="productAttributes" type="ProductAttributeMetadata" repeated="true"
+               provider="Magento\CatalogDataExporter\Model\Provider\ProductMetadata">
+            <using field="id" />
+        </field>
     </record>
     <record name="Image">
         <field name="url" type="String"/>
@@ -98,10 +106,87 @@
             <using field="productId" />
             <using field="storeViewCode" />
         </field>
+        <field name="entered_options" type="EnteredOption" repeated="true"
+               provider="Magento\CatalogDataExporter\Model\Provider\Product\CustomizableOptions\EnteredOptions"
+        >
+            <using field="productId" />
+            <using field="storeViewCode" />
+        </field>
+        <field name="media_gallery" type="MediaItem" repeated="true"
+               provider="Magento\CatalogDataExporter\Model\Provider\Product\MediaGallery"
+        >
+            <using field="productId" />
+            <using field="storeViewCode" />
+        </field>
+    </record>
+    <record name="Category">
+        <field name="categoryId" type="ID"/>
+        <field name="storeViewCode" type="String"/>
+        <field name="isActive" type="Int"/>
+        <field name="isAnchor" type="Int"/>
+        <field name="displayMode" type="String"/>
+        <field name="description" type="String"/>
+        <field name="metaTitle" type="String"/>
+        <field name="metaKeywords" type="String"/>
+        <field name="metaDescription" type="String"/>
+        <field name="name" type="String"/>
+        <field name="childrenCount" type="Int" />
+        <field name="includeInMenu" type="Int" />
+        <field name="path" type="String"/>
+        <field name="pathInStore" type="String"
+               provider="Magento\CatalogDataExporter\Model\Provider\Category\PathInStore"
+        >
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+        <field name="urlKey" type="String"/>
+        <field name="urlPath" type="String"/>
+        <field name="image" type="String"
+               provider="Magento\CatalogDataExporter\Model\Provider\Category\Image"
+        >
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+        <field name="position" type="Int"/>
+        <field name="level" type="Int"/>
+        <field name="parentId" type="Int"/>
+        <field name="createdAt" type="String"/>
+        <field name="updatedAt" type="String"/>
+        <field name="productCount" type="Int"
+               provider="Magento\CatalogDataExporter\Model\Provider\Category\ProductCount">
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+        <field name="availableSortBy" type="String" repeated="true"
+               provider="Magento\CatalogDataExporter\Model\Provider\Category\AvailableSortBy"
+        >
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+        <field name="defaultSortBy" type="String"
+               provider="Magento\CatalogDataExporter\Model\Provider\Category\DefaultSortBy"
+        >
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+        <field name="breadcrumbs" type="Breadcrumbs" provider="Magento\CatalogDataExporter\Model\Provider\Category\Breadcrumbs" repeated="true">
+            <using field="categoryId" />
+            <using field="storeViewCode" />
+        </field>
+        <field name="children" type="String" provider="Magento\CatalogDataExporter\Model\Provider\Category\Children" repeated="true">
+            <using field="categoryId" />
+            <using field="storeViewCode" />
+        </field>
     </record>
     <record name="Attribute">
         <field name="attributeCode" type="String"/>
+        <field name="type" type="String" />
         <field name="value" type="String" repeated="true"/>
+        <field name="complexValue" type="AttributeValue" repeated="true"/>
+    </record>
+    <record name="AttributeValue">
+        <field name="id" type="ID" />
+        <field name="value" type="String" />
     </record>
     <record name="PriceRange">
         <field name="minimumPrice" type="ProductPrice"/>
@@ -132,14 +217,94 @@
     <record name="Option">
         <field name="id" type="ID" />
         <field name="type" type="String" />
-        <field name="required" type="Boolean" />
-        <field name="multi" type="Boolean" />
+        <field name="attribute_id" type="String" />
+        <field name="attribute_code" type="String" />
+        <field name="use_default" type="Boolean" />
+        <field name="render_type" type="String" />
+        <field name="is_required" type="Boolean" />
         <field name="title" type="String" />
+        <field name="sort_order" type="Int" />
+        <field name="product_sku" type="String" />
         <field name="values" type="OptionValue" repeated="true" />
     </record>
     <record name="OptionValue">
         <field name="id" type="ID" />
-        <field name="value" type="String" />
         <field name="price" type="ProductPrice" />
+        <field name="price_type" type="String" />
+        <field name="label" type="String" />
+        <field name="sort_order" type="Int" />
+        <field name="is_default" type="Boolean" />
+        <field name="sample" type="String" />
+        <field name="value" type="String" />
+        <field name="sku" type="String" />
+        <field name="default_label" type="String" />
+        <field name="store_label" type="String" />
+        <field name="quantity" type="Float" />
+        <field name="can_change_quantity" type="Boolean" />
+        <field name="entity_id" type="Int" />
+    </record>
+    <record name="EnteredOption">
+        <field name="id" type="ID" />
+        <field name="value" type="String" />
+        <field name="is_required" type="Boolean" />
+        <field name="sort_order" type="Int" />
+        <field name="type" type="String" />
+        <field name="render_type" type="String" />
+        <field name="product_sku" type="String" />
+        <field name="sku" type="String" />
+        <field name="price" type="ProductPrice" />
+        <field name="price_type" type="String" />
+        <field name="max_characters" type="Int" />
+        <field name="file_extension" type="String" />
+        <field name="image_size_x" type="Int" />
+        <field name="image_size_y" type="Int" />
+    </record>
+    <record name="ProductAttributeMetadata">
+        <field name="id" type="ID" />
+        <field name="storeCode" type="String"/>
+        <field name="websiteCode" type="String"/>
+        <field name="storeViewCode" type="String" />
+        <field name="attributeCode" type="String" />
+        <field name="dataType" type="String" />
+        <field name="multi" type="Boolean" />
+        <field name="label" type="String" />
+        <field name="required" type="Boolean" />
+        <field name="unique" type="Boolean" />
+        <field name="global" type="Boolean" />
+        <field name="visible" type="Boolean" />
+        <field name="searchable" type="Boolean" />
+        <field name="filterable" type="Boolean" />
+        <field name="visibleInCompareList" type="Boolean" />
+        <field name="visibleInListing" type="Boolean" />
+        <field name="sortable" type="Boolean" />
+        <field name="visibleInSearch" type="Boolean" />
+        <field name="filterableInSearch" type="Boolean" />
+        <field name="searchWeight" type="Float" />
+        <field name="usedForRules" type="Boolean" />
+        <field name="boolean" type="Boolean" />
+        <field name="systemAttribute" type="Boolean" />
+        <field name="numeric" type="Boolean" />
+    </record>
+    <record name="Breadcrumbs">
+        <field name="categoryId" type="String"/>
+        <field name="categoryName" type="String"/>
+        <field name="categoryLevel" type="Int"/>
+        <field name="categoryUrlKey" type="String"/>
+        <field name="categoryUrlPath" type="String"/>
+    </record>
+    <record name="MediaItem">
+        <field name="url" type="String"/>
+        <field name="label" type="String"/>
+        <field name="types" type="String" repeated="true"/>
+        <field name="sort_order" type="Int"/>
+        <field name="video_attributes" type="VideoAttributes"/>
+    </record>
+    <record name="VideoAttributes">
+        <field name="mediaType" type="String"/>
+        <field name="videoProvider" type="String"/>
+        <field name="videoUrl" type="String"/>
+        <field name="videoTitle" type="String"/>
+        <field name="videoDescription" type="String"/>
+        <field name="videoMetadata" type="String"/>
     </record>
 </config>

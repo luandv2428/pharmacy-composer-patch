@@ -1,0 +1,117 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+namespace Magento\CmsStaging\Test\Unit\Controller\Adminhtml\Page\Save;
+
+use Magento\Cms\Controller\Adminhtml\Page\Save;
+use Magento\CmsStaging\Controller\Adminhtml\Page\Save\Plugin;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+
+class PluginTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @var Plugin
+     */
+    private $controller;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
+    private $logger;
+
+    /**
+     * @var TimezoneInterface|MockObject
+     */
+    private $localeDate;
+
+    protected function setUp()
+    {
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->localeDate = $this->createMock(TimezoneInterface::class);
+
+        $this->controller = new Plugin(
+            $this->logger,
+            $this->localeDate
+        );
+    }
+
+    /**
+     * @dataProvider dataProviderBeforeExecute
+     * @param mixed $customTheme
+     * @param bool $hasCustomeTheme
+     */
+    public function testBeforeExecute(
+        $customTheme,
+        $hasCustomeTheme
+    ) {
+        $date = '2000-01-01';
+        $this->localeDate->method('formatDate')
+            ->willReturn($date);
+
+        $pageSaveMock = $this->createMock(Save::class);
+        $requestMock = $this->createMock(Http::class);
+
+        $requestMock->expects($this->once())
+            ->method('getPostValue')
+            ->with('custom_theme')
+            ->willReturn($customTheme);
+
+        if ($hasCustomeTheme) {
+            $requestMock->expects($this->once())
+                ->method('setPostValue')
+                ->with('custom_theme_from', $date)
+                ->willReturnSelf();
+        } else {
+            $requestMock->expects($this->once())
+                ->method('setPostValue')
+                ->with('custom_theme_from', null)
+                ->willReturnSelf();
+        }
+
+        $pageSaveMock->expects($this->exactly(2))
+            ->method('getRequest')
+            ->willReturn($requestMock);
+
+        $this->controller->beforeExecute($pageSaveMock);
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderBeforeExecute()
+    {
+        return [
+            [1, true],
+            ['1', true],
+            [0, false],
+            ['test', false],
+            [null, false],
+            ['', false],
+        ];
+    }
+
+    public function testBeforeExecuteException()
+    {
+        $pageSaveMock = $this->getMockBuilder(Save::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $exception = new \Exception(__('Error'));
+
+        $pageSaveMock->expects($this->once())
+            ->method('getRequest')
+            ->willThrowException($exception);
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with($exception)
+            ->willReturnSelf();
+
+        $this->controller->beforeExecute($pageSaveMock);
+    }
+}

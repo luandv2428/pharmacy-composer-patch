@@ -13,7 +13,7 @@ use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class Attributes
+ * Product attributes data provider
  */
 class Attributes
 {
@@ -38,8 +38,6 @@ class Attributes
     private $logger;
 
     /**
-     * Attributes constructor.
-     *
      * @param ResourceConnection $resourceConnection
      * @param ProductAttributeQuery $attributeQuery
      * @param AttributeMetadata $attributeMetadata
@@ -55,20 +53,6 @@ class Attributes
         $this->attributeQuery = $attributeQuery;
         $this->attributeMetadata = $attributeMetadata;
         $this->logger = $logger;
-    }
-
-    /**
-     * Format attribute
-     *
-     * @param string $attributeCode
-     * @param string $storeViewCode
-     * @param null|string $value
-     * @return array
-     * @throws \Zend_Db_Statement_Exception
-     */
-    private function formatAttribute(string $attributeCode, string $storeViewCode, ?string $value) : array
-    {
-        return $this->attributeMetadata->getOptionById($attributeCode, $storeViewCode, $value);
     }
 
     /**
@@ -103,15 +87,25 @@ class Attributes
                     $output[$key]['storeViewCode'] = $storeViewCode;
                     $output[$key]['attributes'] = [
                         'attributeCode' => $row['attributeCode'],
+                        'type' => $row['frontendInput'],
                         'value' => ($row['value'] != null) ?
-                                $this->formatAttribute($row['attributeCode'], $storeViewCode, $row['value'])
-                                : null
+                            $this->attributeMetadata->getAttributeValue(
+                                $row['attributeCode'],
+                                $storeViewCode,
+                                $row['value']
+                            ) : null,
+                        'complexValue' => ($row['value'] != null) ?
+                            $this->attributeMetadata->getOptionById(
+                                $row['attributeCode'],
+                                $storeViewCode,
+                                $row['value']
+                            ) : null
                     ];
                 }
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve attributes data'));
+            throw new UnableRetrieveData('Unable to retrieve attributes data', 0, $exception);
         }
         return $output;
     }

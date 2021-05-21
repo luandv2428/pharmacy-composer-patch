@@ -1,0 +1,28 @@
+<?php
+// @codingStandardsIgnoreFile
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<div id="mycard_form_ewayrapid" data-bind="scope:'mycardFormEwayrapid'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+<script type="text/x-magento-init">
+    {
+        "#mycard_form_ewayrapid": {
+            "Magento_Ui/js/core/app": {"components": {"mycardFormEwayrapid": {"component": "Eway_DirectConnection/js/view/mycard/direct"}}}
+        }
+    }
+</script>
+<script>
+    require(
+        ['ko', 'jquery', 'mage/apply/main'],
+        function(ko, $, mage) {
+            if ($('#ewayrapid_card_number').length == 0) {
+                mage.apply();
+                var element = $('#mycard_form_ewayrapid')[0];
+                ko.cleanNode(element);
+                ko.applyBindings(undefined, element);
+            }
+        });
+</script>

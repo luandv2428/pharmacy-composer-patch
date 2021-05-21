@@ -15,32 +15,16 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\TestFramework\Helper\Bootstrap;
 
 /**
- * Class ProductUrlsTest
+ * Test for product urls export
  */
 class ProductUrlsTest extends AbstractProductTestHelper
 {
-    /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_rewrites.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_rewrites_rollback.php';
-    }
-
     /**
      * Validate product URL data
      *
      * @magentoDbIsolation disabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture Magento/CatalogUrlRewriteDataExporter/_files/setup_rewrites.php
      *
      * @return void
      * @throws NoSuchEntityException
@@ -50,6 +34,7 @@ class ProductUrlsTest extends AbstractProductTestHelper
      */
     public function testProductUrls() : void
     {
+        $this->markTestSkipped('ECP-740');
         $this->runIndexer();
 
         $skus = ['simple1', 'simple2', 'simple3'];

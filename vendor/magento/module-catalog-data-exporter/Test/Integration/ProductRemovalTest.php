@@ -16,22 +16,6 @@ use Magento\TestFramework\Helper\Bootstrap;
 class ProductRemovalTest extends AbstractProductTestHelper
 {
     /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_product_removal.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_product_removal_rollback.php';
-    }
-
-    /**
      * @var mixed
      */
     private $productFeed;
@@ -39,7 +23,7 @@ class ProductRemovalTest extends AbstractProductTestHelper
     /**
      * Integration test setup
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->productFeed = Bootstrap::getObjectManager()->create(Products::class);
@@ -50,7 +34,7 @@ class ProductRemovalTest extends AbstractProductTestHelper
      *
      * @magentoDbIsolation disabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture Magento/CatalogDataExporter/_files/setup_product_removal.php
      *
      * @return void
      * @throws NoSuchEntityException

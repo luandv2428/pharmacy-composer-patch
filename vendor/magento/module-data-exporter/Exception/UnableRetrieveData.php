@@ -7,12 +7,10 @@ declare(strict_types=1);
 
 namespace Magento\DataExporter\Exception;
 
-use Magento\Framework\Exception\LocalizedException;
-
 /**
- * Class UnableRetrieveData
+ * Exception thrown if an error occurs during data retrieving process
  */
-class UnableRetrieveData extends LocalizedException
+class UnableRetrieveData extends \Exception
 {
 
 }

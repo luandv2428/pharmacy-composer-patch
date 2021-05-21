@@ -1,0 +1,304 @@
+<?php
+/** @var \Eway\EwayRapid\Block\Mycards\Edit $block */
+/** @var \Eway\EwayRapid\Model\Customer\Token $_token */
+$_token = $block->getCurrentToken();
+$_address = $_token ? $_token->getAddress() : null;
+?>
+<style>
+    @media screen and (min-width: 768px) {
+        .form-mycard-edit fieldset {width: 48%;}
+        .form-mycard-edit fieldset.credit-card-info {clear: left; float: left;}
+        .form-mycard-edit fieldset.billing-address {float: right;}
+    }
+    .form-mycard-edit .actions-toolbar {clear: both;}
+    .form-mycard-edit .actions-toolbar .primary {float:right;}
+    .form-mycard-edit .actions-toolbar .secondary {float:right; margin-right: 20px;}
+    .form-mycard-edit .street2 {margin-top: 10px;}
+
+    .form-mycard-edit .fieldset > .field.required > .label {padding-left: 0;}
+    .form-mycard-edit .fieldset > .field.required > .label span:after {margin-left: 5px; top: 0;}
+    .form-mycard-edit div.mage-error {
+        border: 1px solid #e22626;
+        display: block;
+        margin: 2px 0 0;
+        padding: 6px 10px 10px;
+        background: #fff8d6;
+        color: #555;
+        font-size: 12px;
+        font-weight: 500;
+        box-sizing: border-box;
+    }
+
+</style>
+<script> <?php // @codingStandardsIgnoreLine ?>
+    var ewayRapidConfig = <?php /* @escapeNotVerified @noEscape*/ echo $block->getJsConfig()?>;
+    require(
+        ['jquery', 'domReady!'],
+        function($) {
+            var form = $('#mycard_edit_form');
+            form.find('button.save').on('click', function() {
+                $('body').trigger('processStart');
+                form.trigger('saveCard');
+            });
+        }
+    );
+</script>
+
+<form class="form-mycard-edit" action="<?php /* @escapeNotVerified @noEscape*/ echo $block->getSaveTokenUrl() ?>"
+      id="mycard_edit_form" data-ajax-submit="true">
+    <div class="fieldset-wrapper-title actions-toolbar">
+        <span class="title"><?php /* @escapeNotVerified @noEscape*/
+            echo $_token ? __('Edit Credit Card') : __("New Credit Card") ?></span>
+        <div class="primary">
+            <button type="button" class="action save primary"
+                    title="<?php /* @escapeNotVerified @noEscape*/ echo __('Save Credit Card') ?>">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Save Credit Card') ?></span>
+            </button>
+        </div>
+        <div class="secondary">
+            <button class="action back"
+                    href="<?php /* @escapeNotVerified @noEscape*/ echo $block->escapeUrl($block->getUrl('*/*/')) ?>">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Back') ?></span>
+            </button>
+        </div>
+    </div>
+
+    <fieldset class="fieldset credit-card-info">
+        <legend class="legend"><span><?php /* @escapeNotVerified @noEscape*/ echo __('Credit Card Information') ?>
+            </span></legend><br>
+        <?php /* @escapeNotVerified @noEscape*/ echo $block->getCardBlock()->toHtml() ?>
+        <input type="hidden" name="token_id"
+               value="<?php /* @escapeNotVerified @noEscape*/ echo $_token ? $_token->getId() : '' ?>"/>
+        <input type="hidden" name="customer_id"
+               value="<?php /* @escapeNotVerified @noEscape*/ echo $block->getRequest()->getParam('customer_id') ?>">
+    </fieldset>
+    <fieldset class="fieldset billing-address">
+        <legend class="legend">
+            <span><?php /* @escapeNotVerified @noEscape*/ echo __('Billing Address') ?></span>
+        </legend><br>
+
+        <div class="field title required">
+            <label class="label" for="title">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Title') ?></span>
+            </label>
+            <div class="control">
+                <select id="title" name="prefix" title="<?php /* @escapeNotVerified @noEscape*/ echo __('Title') ?>"
+                       class="input-text" data-validate="{required:true}">
+                    <?php foreach (\Eway\EwayRapid\Model\Config::getAvailableTitles() as $_title) : ?>
+                        <option value="<?php /* @escapeNotVerified @noEscape*/ echo $_title ?>"
+                                <?php if ($_address && $_address->getTitle() == $_title) : ?>
+                                    selected
+                                <?php endif; ?>>
+                            <?php /* @escapeNotVerified @noEscape*/ echo __($_title) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="field firstname required">
+            <label class="label" for="firstname">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('First Name') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" id="firstname" name="firstname"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('First Name') ?>"
+                       class="input-text" data-validate="{required:true}"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getFirstName()) : '' ?>"/>
+            </div>
+        </div>
+
+        <div class="field lastname required">
+            <label class="label" for="lastname">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Last Name') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" id="lastname" name="lastname"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Last Name') ?>"
+                       class="input-text" data-validate="{required:true}"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getLastName()) : '' ?>"/>
+            </div>
+        </div>
+
+        <div class="field company">
+            <label class="label" for="company">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Company') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="company" id="company"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Company') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getCompanyName()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field job">
+            <label class="label" for="job">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Job Description') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="job_description" id="job"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Job Description') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getJobDescription()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field phone">
+            <label class="label" for="phone">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Phone') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="telephone" id="phone"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Phone') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getPhone()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field mobile">
+            <label class="label" for="mobile">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Mobile') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="mobile" id="mobile"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Mobile') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getMobile()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field email">
+            <label class="label" for="email">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Email') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="email" id="email"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Email') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getEmail()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field fax">
+            <label class="label" for="fax">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Fax') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="fax" id="fax"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Fax') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getFax()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field street">
+            <label class="label" for="street1">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Street Address') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="street_line_1" id="street1"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Street Address') ?>"
+                       class="input-text"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getStreet1()) : '' ?>" />
+            </div>
+            <div class="control">
+                <input type="text" name="street_line_2" id="street2"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Street Address') ?>"
+                       class="input-text street2"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getStreet2()) : '' ?>" />
+            </div>
+        </div>
+
+        <div class="field city">
+            <label class="label" for="city"><span>
+                    <?php /* @escapeNotVerified @noEscape*/ echo __('City') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="city" class="input-text" id="city"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('City') ?>"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getCity()) : '' ?>" />
+            </div>
+        </div>
+        <div class="field region">
+            <label class="label" for="region_id">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('State/Province') ?></span>
+            </label>
+            <div class="control">
+                <select id="region_id" name="region_id" class="validate-select"
+                        title="<?php /* @escapeNotVerified @noEscape*/ echo __('State/Province') ?>">
+                    <option value="">
+                        <?php /* @escapeNotVerified @noEscape*/ echo __('Please select a region, state or province.') ?>
+                    </option>
+                </select>
+                <input type="text" id="region" name="region_code" class="input-text"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('State/Province') ?>"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getState()) : '' ?>" />
+            </div>
+        </div>
+        <div class="field zip">
+            <label class="label" for="zip">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Zip/Postal Code') ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="postcode" id="zip" class="input-text validate-zip-international"
+                       title="<?php /* @escapeNotVerified @noEscape*/ echo __('Zip/Postal Code') ?>"
+                       value="<?php /* @escapeNotVerified @noEscape*/
+                            echo $_address ? $block->escapeHtml($_address->getPostalCode()) : '' ?>" />
+            </div>
+        </div>
+        <div class="field country required">
+            <label class="label" for="country">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Country') ?></span>
+            </label>
+            <div class="control">
+                <?php /* @escapeNotVerified @noEscape*/ echo $block->getCountryHtmlSelect() ?>
+            </div>
+        </div>
+    </fieldset>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="button" class="action save primary"
+                    title="<?php /* @escapeNotVerified @noEscape*/ echo __('Save Credit Card') ?>">
+                <span><?php /* @escapeNotVerified @noEscape*/ echo __('Save Credit Card') ?></span>
+            </button>
+        </div>
+    </div>
+</form>
+<script> <?php // @codingStandardsIgnoreLine ?>
+    require(["jquery", "prototype", "mage/adminhtml/form"], function(jQuery) {
+        var updater = new regionUpdater(
+            'country',
+            'region',
+            'region_id',
+            <?php /* @escapeNotVerified @noEscape*/
+                    echo $this->helper('Magento\Directory\Helper\Data')->getRegionJson() ?>
+        );
+    <?php if ($_address) : ?>
+        jQuery('#country').val('<?php /* @escapeNotVerified @noEscape*/ echo strtoupper($_address->getCountry()) ?>');
+        jQuery('#region').val('<?php /* @escapeNotVerified @noEscape*/ echo strtoupper($_address->getState()) ?>');
+        updater.update();
+    <?php endif; ?>
+    });
+</script>
+<script type="text/x-magento-init">
+    {
+        "#mycard_edit_form": {
+            "validation": {}
+        }
+    }
+</script>
+
+

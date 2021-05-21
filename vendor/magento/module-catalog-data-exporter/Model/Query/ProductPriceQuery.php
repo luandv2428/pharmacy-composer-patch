@@ -12,6 +12,8 @@ use Magento\Framework\DB\Select;
 
 /**
  * Class ProductPriceQuery
+ *
+ * Provides a query to export product prices
  */
 class ProductPriceQuery
 {
@@ -24,14 +26,11 @@ class ProductPriceQuery
      * MainProductQuery constructor.
      *
      * @param ResourceConnection $resourceConnection
-     * @param string $mainTable
      */
     public function __construct(
-        ResourceConnection $resourceConnection,
-        string $mainTable = 'catalog_product_entity'
+        ResourceConnection $resourceConnection
     ) {
         $this->resourceConnection = $resourceConnection;
-        $this->mainTable = $mainTable;
     }
 
     /**

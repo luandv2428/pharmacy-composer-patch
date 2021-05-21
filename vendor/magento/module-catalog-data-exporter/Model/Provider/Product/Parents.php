@@ -88,7 +88,7 @@ class Parents
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve parent product data'));
+            throw new UnableRetrieveData('Unable to retrieve parent product data');
         }
         return $output;
     }

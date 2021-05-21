@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_submit_all_after">
+        <observer name="ewayrapid_order_create_after" instance="\Eway\EwayRapid\Observer\OrderCreateAfter" />
+    </event>
+    <event name="ewayrapid_fraud_detected">
+        <observer name="ewayrapid" instance="\Eway\EwayRapid\Observer\FraudDetected"/>
+    </event>
+</config>

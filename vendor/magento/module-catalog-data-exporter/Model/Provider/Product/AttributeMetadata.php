@@ -12,7 +12,7 @@ use Magento\Framework\DB\Select;
 use Magento\Framework\DB\Sql\Expression;
 
 /**
- * Class AttributeMetadata
+ * Class for Attribute Metadata
  */
 class AttributeMetadata
 {
@@ -57,8 +57,9 @@ class AttributeMetadata
             ->where('a.attribute_code = ?', $attributeCode);
     }
 
-
     /**
+     * Get options raw
+     *
      * @param string $attributeCode
      * @return Select
      */
@@ -99,7 +100,7 @@ class AttributeMetadata
         }
         $cursor = $connection->query($this->getRawOptionsSelect($attributeCode));
         while ($row = $cursor->fetch()) {
-            if ($row['source_model'] == 'Magento\Eav\Model\Entity\Attribute\Source\Boolean') {
+            if ($row['source_model'] == \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class) {
                 $this->attributeMetadata[$row['attribute_code']]['options']['admin'][0] = 'no';
                 $this->attributeMetadata[$row['attribute_code']]['options']['admin'][1] = 'yes';
             } else {
@@ -122,6 +123,33 @@ class AttributeMetadata
     }
 
     /**
+     * Returns attribute real value
+     *
+     * @param string $attributeCode
+     * @param string $storeViewCode
+     * @param string $value
+     * @return array
+     */
+    public function getAttributeValue(string $attributeCode, string $storeViewCode, string $value): array
+    {
+        $attributeMetadata = $this->getAttributeMetadata($attributeCode);
+        $output = null;
+        $optionIds = explode(',', $value);
+        foreach ($optionIds as $optionId) {
+            if (isset($attributeMetadata['options'][$storeViewCode][$optionId])) {
+                $output[] = $attributeMetadata['options'][$storeViewCode][$optionId];
+            } elseif (isset($attributeMetadata['options']['admin'][$optionId])) {
+                $output[] = $attributeMetadata['options']['admin'][$optionId];
+            } else {
+                $output[] = $optionId;
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * Get options
+     *
      * @param string $attributeCode
      * @param string $storeViewCode
      * @param string $value
@@ -134,11 +162,20 @@ class AttributeMetadata
         $optionIds = explode(',', $value);
         foreach ($optionIds as $optionId) {
             if (isset($attributeMetadata['options'][$storeViewCode][$optionId])) {
-                $output[] = $attributeMetadata['options'][$storeViewCode][$optionId];
+                $output[] = [
+                    'id' => $optionId,
+                    'value' => $attributeMetadata['options'][$storeViewCode][$optionId]
+                ];
             } elseif (isset($attributeMetadata['options']['admin'][$optionId])) {
-                $output[] = $attributeMetadata['options']['admin'][$optionId];
+                $output[] = [
+                    'id' => $optionId,
+                    'value' => $attributeMetadata['options']['admin'][$optionId]
+                ];
             } else {
-                $output[] = $optionId;
+                $output[] = [
+                    'id' => -1,
+                    'value' => $optionId
+                ];
             }
         }
         return $output;

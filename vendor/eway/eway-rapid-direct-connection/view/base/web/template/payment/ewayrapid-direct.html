@@ -1,0 +1,125 @@
+<style>
+    @media screen and (min-width: 768px) {
+        .token-list,
+        #payment_form_ewayrapid .admin__control-text,
+        #payment_form_ewayrapid .mage-error {width: 50%;}
+    }
+    .token-list {margin-top: 10px;}
+</style>
+
+<!-- ko if: isTokenEnabled() -->
+    <div class="field-token-list admin__field">
+        <div class="admin__field-control">
+            <select class="token-list"
+                    data-bind=" options:        tokenList,
+                                optionsText:    'card',
+                                value:          selectedToken,
+                                optionsCaption: 'Use a new card'"></select>
+
+            <!-- ko if: canEditToken() -->
+                <button type="button" title="Edit saved card" class="action primary"
+                        data-bind="visible: !isEditing(), click: editToken"><span>Edit</span></button>
+
+                <button type="button" title="Cancel" class="action cancel"
+                        data-bind="visible: isEditing(), click: cancelEditToken"><span>Cancel Edit</span></button>
+            <!-- /ko -->
+        </div>
+    </div>
+<!-- /ko -->
+    <div class="field-name admin__field _required" data-bind="afterRender: loadScript, visible: showFullCard">
+        <label class="admin__field-label" for="ewayrapid_cc_name">
+            <span>Card Name</span>
+        </label>
+        <div class="admin__field-control">
+            <input type="text" name="payment[additional_information][Name]" class="admin__control-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: 'ewayrapid_cc_name',
+                                    title: $t('Credit Card Name'),
+                                    'data-container': 'ewayrapid-cc-name',
+                                    'data-validate': JSON.stringify({'required':true})
+                                },
+                                enable: showFullCard,
+                                value: creditCardName"/>
+
+        </div>
+    </div>
+
+    <div class="field-number admin__field _required" data-bind="visible: showFullCard">
+        <label class="admin__field-label" for="ewayrapid_cc_number">
+            <span>Card Number</span>
+        </label>
+        <div class="admin__field-control" data-bind="visible: !isEditing()">
+            <input type="text" class="admin__control-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: 'ewayrapid_cc_number',
+                                    title: $t('Credit Card Number'),
+                                    'data-container': 'ewayrapid-cc-number',
+                                    'data-validate': JSON.stringify({
+                                        'required-number':true,
+                                        'validate-card-type':getCcAvailableTypesValues(),
+                                        'validate-card-number':'#ewayrapid_cc_type'
+                                    })
+                              },
+                              enable: showFullCard() && !isEditing(),
+                              value: creditCardNumber,
+                              valueUpdate: 'keyup' "/>
+        </div>
+        <div class="admin__field-control" data-bind="visible: isEditing()">
+            <strong><span data-bind="text: getSelectedCardNumber()"></span></strong>
+            <div><span>(To use a new credit card number, please add another card)</span></div>
+        </div>
+    </div>
+
+    <div class="field-date admin__field _required" data-bind="visible: showFullCard">
+        <label class="admin__field-label" for="ewayrapid_expiration">
+            <span>Card Expiry</span>
+        </label>
+        <div class="admin__field-control">
+            <select  name="payment[additional_information][ExpiryMonth]"
+                     class="admin__control-select admin__control-select-month"
+                     data-bind="attr: {
+                                    id: 'ewayrapid_expiration',
+                                    'data-container': 'ewayrapid-cc-month',
+                                    'data-validate': JSON.stringify({
+                                        required:true,
+                                        'validate-cc-exp':'#ewayrapid_expiration_yr'
+                                    })
+                                },
+                                enable: showFullCard,
+                                options: getCcMonthsValues(),
+                                optionsValue: 'value',
+                                optionsText: 'month',
+                                optionsCaption: $t('Month'),
+                                value: creditCardExpMonth">
+            </select>
+            <select name="payment[additional_information][ExpiryYear]"
+                    class="admin__control-select admin__control-select-year"
+                    data-bind="attr: {
+                                    id: 'ewayrapid_expiration_yr',
+                                    'data-container': 'ewayrapid-cc-year',
+                                    'data-validate': JSON.stringify({required:true})
+                                },
+                                enable: showFullCard,
+                                options: getCcYearsValues(),
+                                optionsValue: 'value',
+                                optionsText: 'year',
+                                optionsCaption: $t('Year'),
+                                value: creditCardExpYear">
+            </select>
+        </div>
+    </div>
+
+<!-- ko if: isTokenEnabled() -->
+    <div class="field-token-list admin__field" data-bind="visible: !selectedToken()">
+        <div class="admin__field-control">
+            <input type="checkbox" id="save_card" class="checkbox" data-bind="checked: saveCard"/>
+            <label for="save_card" class="label"><span data-bind="text: getSaveText()"></span></label>
+        </div>
+    </div>
+    <input type="hidden" id="ewayrapid_token_id" name="payment[additional_information][TokenID]" value="" />
+    <input type="hidden" id="ewayrapid_token_action" name="payment[additional_information][TokenAction]" value="" />
+<!-- /ko -->
+<input type="hidden" id="ewayrapid_card_number" name="payment[additional_information][Number]" value="" />
+<input type="hidden" name="ewayrapid_create_from_admin" value="1" />

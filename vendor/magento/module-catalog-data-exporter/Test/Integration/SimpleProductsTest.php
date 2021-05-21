@@ -13,32 +13,16 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\TestFramework\Helper\Bootstrap;
 
 /**
- * Class SimpleProductsTest
+ * Test class for simple product export
  */
 class SimpleProductsTest extends AbstractProductTestHelper
 {
-    /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_simple_products.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_simple_products_rollback.php';
-    }
-
     /**
      * Validate simple product data
      *
      * @magentoDbIsolation disabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadFixture
+     * @magentoDataFixture Magento/CatalogDataExporter/_files/setup_simple_products_with_media_gallery.php
      *
      * @return void
      * @throws NoSuchEntityException
@@ -54,16 +38,18 @@ class SimpleProductsTest extends AbstractProductTestHelper
         $storeViewCodes = ['default', 'fixture_second_store'];
 
         foreach ($skus as $sku) {
-            $product = $this->productRepository->get($sku);
-            $product->setTypeInstance(Bootstrap::getObjectManager()->create(Simple::class));
-
             foreach ($storeViewCodes as $storeViewCode) {
+                $store = $this->storeManager->getStore($storeViewCode);
+                $product = $this->productRepository->get($sku, false, $store->getId());
+                $product->setTypeInstance(Bootstrap::getObjectManager()->create(Simple::class));
+
                 $extractedProduct = $this->getExtractedProduct($sku, $storeViewCode);
                 $this->validateBaseProductData($product, $extractedProduct, $storeViewCode);
                 $this->validateCategoryData($product, $extractedProduct);
                 $this->validatePricingData($product, $extractedProduct);
                 $this->validateImageUrls($product, $extractedProduct);
                 $this->validateAttributeData($product, $extractedProduct);
+                $this->validateMediaGallery($product, $extractedProduct);
             }
         }
     }

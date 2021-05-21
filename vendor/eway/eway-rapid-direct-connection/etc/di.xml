@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- ###############################################################################################-->
+    <!-- ################                        DIRECT CONNECTION                      ################-->
+    <!-- ###############################################################################################-->
+
+    <!-- Add DirectConnection method to the Adapter -->
+    <virtualType name="EwayRapidMethodAdapter">
+        <arguments>
+            <argument name="methodInstances" xsi:type="array">
+                <item name="direct" xsi:type="string">EwayRapidDirectConnectionFacade</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectConnectionFacade" type="\Eway\DirectConnection\Model\Method\Adapter">
+        <arguments>
+            <argument name="code"               xsi:type="const">\Eway\EwayRapid\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType"      xsi:type="string">EwayRapidDirectFormBlock</argument>
+            <argument name="infoBlockType"      xsi:type="string">\Eway\EwayRapid\Block\Info\Cc</argument>
+            <argument name="valueHandlerPool"   xsi:type="object">EwayRapidDefaultValueHandlerPool</argument>
+            <argument name="validatorPool"      xsi:type="object">EwayRapidValidatorPool</argument>
+            <argument name="commandPool"        xsi:type="object">EwayRapidDirectConnectionCommandPool</argument>
+            <argument name="config"             xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+    <type name="Eway\EwayRapid\Model\Ui\ConfigProvider">
+        <arguments>
+            <argument name="methodSpecificConfig" xsi:type="array">
+                <item name="direct" xsi:type="object">\Eway\DirectConnection\Model\Ui\Config</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="\Eway\DirectConnection\Model\Ui\Config">
+        <arguments>
+            <argument name="config"         xsi:type="object">EwayRapidConfig</argument>
+            <argument name="commandPool"    xsi:type="object">EwayRapidDirectConnectionCommandPool</argument>
+        </arguments>
+    </type>
+
+    <!-- Command Pool -->
+    <virtualType name="EwayRapidDirectConnectionCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize"          xsi:type="string">EwayRapidDirectAuthorizeStrategyCommand</item>
+                <item name="sale"               xsi:type="string">EwayRapidDirectAuthorizeStrategyCommand</item>
+                <item name="capture"            xsi:type="string">EwayRapidDirectCaptureStrategyCommand</item>
+                <item name="pre_auth_capture"   xsi:type="string">EwayRapidPreAuthCaptureCommand</item>
+                <item name="non_token_authorize" xsi:type="string">EwayRapidDirectAuthorizeCommand</item>
+                <item name="create_token"       xsi:type="string">EwayRapidDirectCreateTokenCommand</item>
+                <item name="update_token"       xsi:type="string">EwayRapidDirectUpdateTokenCommand</item>
+                <item name="charge_token"       xsi:type="string">EwayRapidDirectChargeTokenCommand</item>
+                <item name="charge_token_moto"  xsi:type="string">EwayRapidDirectChargeTokenCommand</item>
+                <item name="void"               xsi:type="string">EwayRapidCancelTransactionCommand</item>
+                <item name="cancel"             xsi:type="string">EwayRapidCancelTransactionCommand</item>
+                <item name="refund"             xsi:type="string">EwayRapidRefundTransactionCommand</item>
+                <item name="query_transaction"  xsi:type="string">EwayRapidQueryTransactionByIdCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectAuthorizeCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientCreateTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidDirectCreateTransactionDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidDirectValidator</argument>
+            <argument name="handler"            xsi:type="object">EwayRapidDirectResponseHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectCaptureStrategyCommand" type="\Eway\EwayRapid\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">EwayRapidDirectConnectionCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectAuthorizeStrategyCommand" type="\Eway\DirectConnection\Gateway\Command\AuthorizeStrategyCommand">
+        <arguments>
+            <argument name="commandPool"    xsi:type="object">EwayRapidDirectConnectionCommandPool</argument>
+            <argument name="config"         xsi:type="object">EwayRapidConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectCreateTokenCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientCreateCustomer</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidDirectCreateTokenDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidCreateTokenValidator</argument>
+            <argument name="handler"            xsi:type="object">EwayRapidCreateTokenHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectUpdateTokenCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientUpdateCustomer</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidDirectCreateTokenDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidCreateTokenValidator</argument>
+            <argument name="handler"            xsi:type="object">EwayRapidUpdateTokenHandler</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectChargeTokenCommand" type="\Eway\EwayRapid\Gateway\Command\GenericCommand">
+        <arguments>
+            <argument name="client"             xsi:type="object">EwayRapidClientCreateTransaction</argument>
+            <argument name="requestBuilder"     xsi:type="object">EwayRapidDirectChargeTokenDataBuilder</argument>
+            <argument name="transferFactory"    xsi:type="object">EwayRapidTransferFactory</argument>
+            <argument name="validator"          xsi:type="object">EwayRapidDirectValidator</argument>
+            <argument name="handler"            xsi:type="object">EwayRapidDirectResponseHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Request Builder -->
+    <virtualType name="EwayRapidDirectCreateTransactionDataBuilder" type="\Eway\EwayRapid\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="base_request"       xsi:type="string">\Eway\EwayRapid\Gateway\Request\BaseRequestDataBuilder</item>
+                <item name="customer"           xsi:type="string">\Eway\EwayRapid\Gateway\Request\CustomerDataBuilder</item>
+                <item name="shipping_address"   xsi:type="string">\Eway\EwayRapid\Gateway\Request\ShippingAddressDataBuilder</item>
+                <item name="items"              xsi:type="string">\Eway\EwayRapid\Gateway\Request\ItemsDataBuilder</item>
+                <item name="payment"            xsi:type="string">\Eway\EwayRapid\Gateway\Request\PaymentDataBuilder</item>
+                <item name="card_details"       xsi:type="string">\Eway\DirectConnection\Gateway\Request\CardDetailsDataBuilder</item>
+            </argument>
+            <argument name="method" xsi:type="const">\Eway\Rapid\Enum\ApiMethod::DIRECT</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectCreateTokenDataBuilder" type="\Eway\EwayRapid\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer"           xsi:type="string">\Eway\EwayRapid\Gateway\Request\CustomerTokenDataBuilder</item>
+                <item name="card_details"       xsi:type="string">\Eway\DirectConnection\Gateway\Request\CreateTokenCardDetailsDataBuilder</item>
+            </argument>
+            <argument name="method" xsi:type="const">\Eway\Rapid\Enum\ApiMethod::DIRECT</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EwayRapidDirectChargeTokenDataBuilder" type="\Eway\EwayRapid\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="base_request"       xsi:type="string">\Eway\EwayRapid\Gateway\Request\BaseRequestDataBuilder</item>
+                <item name="customer"           xsi:type="string">\Eway\EwayRapid\Gateway\Request\CustomerDataBuilder</item>
+                <item name="shipping_address"   xsi:type="string">\Eway\EwayRapid\Gateway\Request\ShippingAddressDataBuilder</item>
+                <item name="items"              xsi:type="string">\Eway\EwayRapid\Gateway\Request\ItemsDataBuilder</item>
+                <item name="payment"            xsi:type="string">\Eway\EwayRapid\Gateway\Request\PaymentDataBuilder</item>
+                <item name="customer_token"     xsi:type="string">\Eway\EwayRapid\Gateway\Request\TokenDataBuilder</item>
+                <item name="cvn"                xsi:type="string">\Eway\DirectConnection\Gateway\Request\CVNDataBuilder</item>
+            </argument>
+            <argument name="method" xsi:type="const">\Eway\Rapid\Enum\ApiMethod::DIRECT</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Response Handlers -->
+    <type name="\Eway\DirectConnection\Gateway\Response\ResponseMessagesHandler">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">EwayRapidDirectConnectionCommandPool</argument>
+        </arguments>
+    </type>
+    <virtualType name="EwayRapidDirectResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="payment_details"    xsi:type="string">\Eway\EwayRapid\Gateway\Response\PaymentDetailsHandler</item>
+                <item name="response_messages"  xsi:type="string">\Eway\DirectConnection\Gateway\Response\ResponseMessagesHandler</item>
+                <item name="card_details"       xsi:type="string">\Eway\EwayRapid\Gateway\Response\CardDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Response Validator -->
+    <virtualType name="EwayRapidDirectValidator" type="\Eway\DirectConnection\Gateway\Validator\ResponseValidator" />
+
+    <!-- Blocks -->
+    <virtualType name="EwayRapidDirectMycardForm" type="\Magento\Framework\View\Element\Template">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="template" xsi:type="string">Eway_DirectConnection::form/mycard.phtml</item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

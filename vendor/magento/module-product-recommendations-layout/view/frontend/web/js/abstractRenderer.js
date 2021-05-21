@@ -61,11 +61,12 @@ define(["uiComponent", "dataServicesBase", "jquery", "Magento_Catalog/js/price-u
                         response[i].products[j].currency !==
                         this.currencyConfiguration.currency
                     ) {
-                        response[i].products[
-                            j
-                        ].prices.minimum.final = this.convertPrice(
-                            response[i].products[j].prices.minimum.final,
-                        )
+                        response[i].products[j].prices.minimum.final =
+                            (response[i].products[j].prices &&
+                            response[i].products[j].prices.minimum &&
+                            response[i].products[j].prices.minimum.final)
+                                ? this.convertPrice(response[i].products[j].prices.minimum.final)
+                                : null;
                         response[i].products[
                             j
                         ].currency = this.currencyConfiguration.currency

@@ -14,7 +14,7 @@ use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class WeightType
+ * Product weight unit data provider
  */
 class WeightUnit
 {
@@ -59,7 +59,7 @@ class WeightUnit
             $weightUnits = $this->getWeightUnit($queryArguments['storeViewCode']);
 
             foreach ($values as $row) {
-                if (!is_null($row['weight'])) {
+                if (isset($row['weight']) && null !== $row['weight']) {
                     $output[] = [
                         'productId' => $row['productId'],
                         'storeViewCode' => $row['storeViewCode'],
@@ -69,7 +69,7 @@ class WeightUnit
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve weight type data'));
+            throw new UnableRetrieveData('Unable to retrieve weight type data');
         }
         return $output;
     }

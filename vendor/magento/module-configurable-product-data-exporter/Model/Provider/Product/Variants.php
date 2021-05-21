@@ -81,7 +81,7 @@ class Variants
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve product variant data'));
+            throw new UnableRetrieveData('Unable to retrieve product variant data');
         }
         return array_values($output);
     }

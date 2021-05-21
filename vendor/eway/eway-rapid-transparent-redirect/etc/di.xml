@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- ###############################################################################################-->
+    <!-- ################                     TRANSPARENT REDIRECT                      ################-->
+    <!-- ###############################################################################################-->
+
+    <!-- Add Transparent Redirect method to the Adapter -->
+    <virtualType name="EwayRapidMethodAdapter">
+        <arguments>
+            <argument name="methodInstances" xsi:type="array">
+                <item name="transparent" xsi:type="string">EwayRapidTransparentFacade</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Eway\EwayRapid\Model\Ui\ConfigProvider">
+        <arguments>
+            <argument name="methodSpecificConfig" xsi:type="array">
+                <item name="transparent" xsi:type="object">\Eway\TransparentRedirect\Model\Ui\Config</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="EwayRapidTransparentFacade" type="\Eway\IFrame\Model\Method\Adapter">
+        <arguments>
+            <argument name="code"               xsi:type="const">\Eway\EwayRapid\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType"      xsi:type="string">EwayRapidIFrameFormBlock</argument>
+            <argument name="infoBlockType"      xsi:type="string">\Eway\EwayRapid\Block\Info\Cc</argument>
+            <argument name="valueHandlerPool"   xsi:type="object">EwayRapidDefaultValueHandlerPool</argument>
+            <argument name="validatorPool"      xsi:type="object">EwayRapidValidatorPool</argument>
+            <argument name="commandPool"        xsi:type="object">EwayRapidIFrameCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Blocks -->
+    <virtualType name="EwayRapidTransparentMycardForm" type="\Magento\Framework\View\Element\Template">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="template" xsi:type="string">Eway_TransparentRedirect::form/mycard.phtml</item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

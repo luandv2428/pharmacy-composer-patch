@@ -182,6 +182,8 @@ class Context extends Template
                 'websiteName' => $website->getName(),
                 'storeName' => $group->getName(),
                 'storeViewName' => $store->getName(),
+                'baseCurrencyCode' => $store->getBaseCurrencyCode(),
+                'storeViewCurrencyCode' => $store->getCurrentCurrency()->getCode(),
                 'catalogExtensionVersion' => $this->getCatalogExtensionVersion()
             ];
             $context = $this->jsonSerializer->serialize($contextData);
@@ -235,5 +237,15 @@ class Context extends Template
     public function isCookieRestrictionModeEnabled()
     {
         return $this->cookieHelper->isCookieRestrictionModeEnabled();
+    }
+
+    /**
+     * Check if DataServices functionality should be enabled
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->servicesConfig->isApiKeySet() && $this->servicesConfig->getEnvironmentId();
     }
 }

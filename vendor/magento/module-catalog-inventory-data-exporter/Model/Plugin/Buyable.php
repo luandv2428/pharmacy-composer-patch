@@ -14,8 +14,7 @@ use Magento\Framework\App\ResourceConnection;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class Buyable
- *
+ * Plugin for fetching products stock status and marking out of stock products
  */
 class Buyable
 {
@@ -35,7 +34,6 @@ class Buyable
     private $catalogInventoryQuery;
 
     /**
-     * Stock constructor.
      * @param ResourceConnection $resourceConnection
      * @param CatalogInventoryQuery $catalogInventoryQuery
      * @param LoggerInterface $logger
@@ -51,25 +49,22 @@ class Buyable
     }
 
     /**
-     * @param array $row
+     * Check stock status after getting buyable product status
+     *
+     * @param ProductBuyable $subject
+     * @param array $result
+     *
      * @return array
+     *
+     * @throws UnableRetrieveData
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    private function format(array $row): array
-    {
-        $output = [
-            'productId' => $row['product_id'],
-            'storeViewCode' => $row['storeViewCode'],
-            'inStock' => $row['is_in_stock'],
-        ];
-        return $output;
-    }
-
     public function afterGet(ProductBuyable $subject, array $result)
     {
         $connection = $this->resourceConnection->getConnection();
         $queryArguments = [];
         try {
-            $output = [];
             foreach ($result as $value) {
                 $queryArguments['productId'][$value['productId']] = $value['productId'];
                 $queryArguments['storeViewCode'][$value['storeViewCode']] = $value['storeViewCode'];
@@ -89,7 +84,7 @@ class Buyable
             }
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve stock data'));
+            throw new UnableRetrieveData('Unable to retrieve stock data');
         }
         return $result;
     }

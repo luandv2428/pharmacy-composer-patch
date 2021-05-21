@@ -17,6 +17,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\UrlInterface;
 use Magento\Indexer\Model\Indexer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\TaxClass\Source\Product as TaxClassSource;
@@ -89,7 +90,7 @@ abstract class AbstractProductTestHelper extends \PHPUnit\Framework\TestCase
     /**
      * Setup tests
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = Bootstrap::getObjectManager()->create(ResourceConnection::class);
         $this->connection = $this->resource->getConnection();
@@ -129,7 +130,7 @@ abstract class AbstractProductTestHelper extends \PHPUnit\Framework\TestCase
     protected function getExtractedProduct(string $sku, string $storeViewCode) : array
     {
         $query = $this->connection->select()
-            ->from(['ex' => self::CATALOG_DATA_EXPORTER])
+            ->from(['ex' => $this->resource->getTableName(self::CATALOG_DATA_EXPORTER)])
             ->where('ex.sku = ?', $sku)
             ->where('ex.store_view_code = ?', $storeViewCode);
         $cursor = $this->connection->query($query);
@@ -251,7 +252,11 @@ abstract class AbstractProductTestHelper extends \PHPUnit\Framework\TestCase
         $this->assertEquals($enabled, $extract['feedData']['status']);
         $this->assertEquals($product->getId(), $extract['feedData']['productId']);
         $this->assertEquals($product->getTypeId(), $extract['feedData']['type']);
-        $this->assertEquals($product->getUrlKey(), $extract['feedData']['urlKey']);
+
+        if ($product->getUrlKey()) {
+            $this->assertEquals($product->getUrlKey(), $extract['feedData']['urlKey']);
+        }
+
         $this->assertEquals($product->getCreatedAt(), $extract['feedData']['createdAt']);
         $this->assertEquals($product->getUpdatedAt(), $extract['feedData']['updatedAt']);
         $this->assertEquals($product->getWeight(), $extract['feedData']['weight']);
@@ -272,14 +277,11 @@ abstract class AbstractProductTestHelper extends \PHPUnit\Framework\TestCase
      */
     protected function validateImageUrls(ProductInterface $product, array $extractedProduct) : void
     {
-        $regex = '/cache\/(.*?)\/(.*?)/';
-        $extractedImageUrl = preg_replace($regex, '', $extractedProduct['feedData']['image']['url']);
-        $extractedSmallImageUrl = preg_replace($regex, '', $extractedProduct['feedData']['smallImage']['url']);
-        $extractedThumbnailUrl = preg_replace($regex, '', $extractedProduct['feedData']['thumbnail']['url']);
+        $feedData = $extractedProduct['feedData'];
 
-        $this->assertEquals($this->productHelper->getImageUrl($product), $extractedImageUrl);
-        $this->assertEquals($this->productHelper->getSmallImageUrl($product), $extractedSmallImageUrl);
-        $this->assertEquals($this->productHelper->getThumbnailUrl($product), $extractedThumbnailUrl);
+        $this->assertEquals($this->productHelper->getImageUrl($product), $feedData['image']['url']);
+        $this->assertEquals($this->productHelper->getSmallImageUrl($product), $feedData['smallImage']['url']);
+        $this->assertEquals($this->productHelper->getThumbnailUrl($product), $feedData['thumbnail']['url']);
     }
 
     /**
@@ -314,7 +316,64 @@ abstract class AbstractProductTestHelper extends \PHPUnit\Framework\TestCase
                 'value' => [$product->getAttributeText('custom_select')]
             ];
         }
+        $feedAttributes = null;
+        if (isset($extractedProduct['feedData']['attributes'])) {
+            $feedAttributesData = $extractedProduct['feedData']['attributes'];
+            foreach ($feedAttributesData as $feed) {
+                $feedAttributes[] = [
+                    'attributeCode' => $feed['attributeCode'],
+                    'value' => [
+                        $feed['complexValue'][0]['value']
+                    ]
+                ];
+            }
+        }
 
-        $this->assertEquals($attributes, $extractedProduct['feedData']['attributes']);
+        $this->assertEquals($attributes, $feedAttributes);
+    }
+
+    /**
+     * Validate product media gallery data in extracted product
+     *
+     * @param ProductInterface $product
+     * @param array $extractedProduct
+     *
+     * @return void
+     *
+     * @throws NoSuchEntityException
+     */
+    protected function validateMediaGallery(ProductInterface $product, array $extractedProduct) : void
+    {
+        if ($product->getSku() === 'simple1') {
+            $productGalleryEntries = $product->getMediaGalleryEntries();
+            $this->assertCount(\count($productGalleryEntries), $extractedProduct['feedData']['media_gallery']);
+
+            $galleryEntry = \array_shift($productGalleryEntries);
+            $extensionAttributes = $galleryEntry->getExtensionAttributes();
+            $mediaBaseUrl = $this->storeManager->getStore($extractedProduct['feedData']['storeViewCode'])
+                ->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
+
+            $expectedResult = [
+                'url' => $mediaBaseUrl . 'catalog/product' . $galleryEntry->getFile(),
+                'label' => $galleryEntry->getLabel() ?: '',
+                'types' => $galleryEntry->getTypes() ?: null,
+                'sort_order' => (int)$galleryEntry->getPosition(),
+            ];
+
+            if (null !== $extensionAttributes && $extensionAttributes->getVideoContent()) {
+                $expectedResult['video_attributes'] = [
+                    'mediaType' => $extensionAttributes->getVideoContent()->getMediaType(),
+                    'videoUrl' => $extensionAttributes->getVideoContent()->getVideoUrl(),
+                    'videoProvider' => $extensionAttributes->getVideoContent()->getVideoProvider(),
+                    'videoTitle' => $extensionAttributes->getVideoContent()->getVideoTitle(),
+                    'videoDescription' => $extensionAttributes->getVideoContent()->getVideoDescription(),
+                    'videoMetadata' => $extensionAttributes->getVideoContent()->getVideoMetadata(),
+                ];
+            }
+
+            $this->assertEquals($expectedResult, \array_shift($extractedProduct['feedData']['media_gallery']));
+        } else {
+            $this->assertNull($extractedProduct['feedData']['media_gallery']);
+        }
     }
 }

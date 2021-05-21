@@ -10,6 +10,7 @@
     data-alternate-environment="<?= $block->escapeHtmlAttr($block->getAlternateEnvironmentId()); ?>"
     data-is-alternate-environment-enabled="<?= $block->escapeHtmlAttr(json_encode($block->isAlternateEnvironmentEnabled())); ?>"
     data-store-view-code="<?= $block->escapeHtmlAttr($block->getStoreViewCode()); ?>"
+    data-website-code="<?= $block->escapeHtmlAttr($block->getWebsiteCode()); ?>"
     data-magento-middleware-url="<?= $block->escapeUrl($block->getUrl('product_recommendations/index/middleware')); ?>"
     data-config-page-url="<?= $block->escapeUrl($block->getUrl('adminhtml/system_config/edit/section/services_connector')); ?>"
     data-store-currency-code="<?= $block->getBaseCurrencyCode(); ?>"

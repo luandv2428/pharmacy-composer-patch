@@ -15,11 +15,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\TestFramework\Helper\Bootstrap;
 
 /**
- * Class ConfigurableProductsTest
+ * Test for configurable product export
  *
- * @magentoDataFixture loadFixture
- * @magentoDbIsolation disabled
- * @magentoAppIsolation enabled
  */
 class ConfigurableProductsTest extends AbstractProductTestHelper
 {
@@ -29,25 +26,9 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     private $configurable;
 
     /**
-     * Load fixtures for test
-     */
-    public static function loadFixture()
-    {
-        include __DIR__ . '/_files/setup_configurable_products.php';
-    }
-
-    /**
-     * Remove fixtures
-     */
-    public static function tearDownAfterClass()
-    {
-        include __DIR__ . '/_files/setup_configurable_products_rollback.php';
-    }
-
-    /**
      * Setup tests
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->configurable = Bootstrap::getObjectManager()->create(Configurable::class);
@@ -56,6 +37,9 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     /**
      * Validate configurable product data
      *
+     * @magentoDataFixture Magento/ConfigurableProductDataExporter/_files/setup_configurable_products.php
+     * @magentoDbIsolation disabled
+     * @magentoAppIsolation enabled
      * @return void
      * @throws NoSuchEntityException
      * @throws LocalizedException
@@ -90,6 +74,9 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     /**
      * Validate parent product data
      *
+     * @magentoDataFixture Magento/ConfigurableProductDataExporter/_files/setup_configurable_products.php
+     * @magentoDbIsolation disabled
+     * @magentoAppIsolation enabled
      * @return void
      * @throws NoSuchEntityException
      * @throws LocalizedException
@@ -146,18 +133,45 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     private function validateOptionsData(ProductInterface $product, array $extractedProduct) : void
     {
         $productOptions = $product->getExtensionAttributes()->getConfigurableProductOptions();
-        $options = [];
+        $expectedOptions = [];
         foreach ($productOptions as $productOption) {
-            $options[] = [
-                'type' => $product->getTypeId(),
-                'required' => (bool) $productOption['product_attribute']['is_required'],
-                'multi' => false,
-                'title' => $productOption->getLabel(),
-                'values' => $this->getOptionValues($productOption->getOptions())
+            $expectedOptions[$productOption['product_super_attribute_id']] = [
+                'id' => $productOption['product_super_attribute_id'],
+                'type' => 'super',
+                'attribute_id' => $productOption['attribute_id'],
+                'attribute_code' => 'test_configurable',
+                'use_default' => false,
+                'title' => 'Test Configurable',
+                'sort_order' => 0,
+                'values' => $this->getOptionValues($productOption->getOptions()),
             ];
         }
-        $extractedOptions = $this->removeGeneratedIdsFromExtractedOptions($extractedProduct);
-        $this->assertEquals($options, $extractedOptions);
+
+        $this->assertCount(count($expectedOptions), $extractedProduct['feedData']['options']);
+        foreach ($extractedProduct['feedData']['options'] as $extractedOption) {
+            $optionId = $extractedOption['id'];
+            $this->assertEquals($expectedOptions[$optionId]['id'], $optionId);
+            $this->assertEquals($expectedOptions[$optionId]['type'], $extractedOption['type']);
+            $this->assertEquals($expectedOptions[$optionId]['attribute_id'], $extractedOption['attribute_id']);
+            $this->assertEquals($expectedOptions[$optionId]['attribute_code'], $extractedOption['attribute_code']);
+            $this->assertEquals($expectedOptions[$optionId]['use_default'], $extractedOption['use_default']);
+            $this->assertEquals($expectedOptions[$optionId]['title'], $extractedOption['title']);
+            $this->assertEquals($expectedOptions[$optionId]['sort_order'], $extractedOption['sort_order']);
+            $this->assertCount(count($expectedOptions[$optionId]['values']), $extractedOption['values']);
+
+            foreach ($extractedOption['values'] as $value) {
+                $valueId = $value['id'];
+                $this->assertEquals($expectedOptions[$optionId]['values'][$valueId]['id'], $valueId);
+                $this->assertEquals(
+                    $expectedOptions[$optionId]['values'][$valueId]['default_label'],
+                    $value['default_label']
+                );
+                $this->assertEquals(
+                    $expectedOptions[$optionId]['values'][$valueId]['store_label'],
+                    $value['store_label']
+                );
+            }
+        }
     }
 
     /**
@@ -191,7 +205,7 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     }
 
     /**
-     * Get option values to compare to extracted product data
+     * Get partially hardcoded option values to compare to extracted product data
      *
      * @param array $optionValues
      * @return array
@@ -199,31 +213,16 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
     private function getOptionValues(array $optionValues) : array
     {
         $values = [];
+        $i = 1;
         foreach ($optionValues as $optionValue) {
-            $values[] = [
-                'value' => $optionValue['store_label'],
-                'price' => null
+            $values[$optionValue['value_index']] = [
+                'id' => $optionValue['value_index'],
+                'default_label' => 'Option ' . $i,
+                'store_label' => 'Option ' . $i,
             ];
+            $i++;
         }
         return $values;
-    }
-
-    /**
-     * Remove generated IDs from the extracted product for data comparison
-     *
-     * @param array $extractedProduct
-     * @return array
-     */
-    private function removeGeneratedIdsFromExtractedOptions(array $extractedProduct) : array
-    {
-        $extractedOptions = $extractedProduct['feedData']['options'];
-        foreach ($extractedOptions as &$extractedOption) {
-            unset($extractedOption['id']);
-            foreach ($extractedOption['values'] as &$extractedOptionValue) {
-                unset($extractedOptionValue['id']);
-            }
-        }
-        return $extractedOptions;
     }
 
     /**
@@ -238,7 +237,7 @@ class ConfigurableProductsTest extends AbstractProductTestHelper
         $selections = [];
         foreach ($attributeCodes as $attributeCode) {
             $selections[] = [
-                'name' => $childProduct->getAttributes()[$attributeCode]['store_label'],
+                'name' => $childProduct->getAttributes()[$attributeCode]->getStoreLabel(),
                 'value' => $childProduct->getAttributeText($attributeCode)
             ];
         }

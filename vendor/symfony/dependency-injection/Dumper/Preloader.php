@@ -87,14 +87,14 @@ class Preloader
 
                 self::preloadType($m->getReturnType(), $preloaded);
             }
-        } catch (\Throwable $e) {
+        } catch (\ReflectionException $e) {
             // ignore missing classes
         }
     }
 
     private static function preloadType(?\ReflectionType $t, array &$preloaded): void
     {
-        if (!$t) {
+        if (!$t || $t->isBuiltin()) {
             return;
         }
 

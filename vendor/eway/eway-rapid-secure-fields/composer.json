@@ -1,0 +1,25 @@
+{
+  "name": "eway/eway-rapid-secure-fields",
+  "description": "Provide Secure Fields method for eWAY Rapid Payment Module for Magento 2",
+  "homepage": "https://www.eway.com.au",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "eWAY",
+      "homepage": "https://www.eway.com.au"
+    }
+  ],
+  "require": {
+    "eway/eway-rapid-direct-connection": "2.0.*"
+  },
+  "type": "magento2-module",
+  "version": "2.0.0",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Eway\\SecureFields\\": ""
+    }
+  }
+}

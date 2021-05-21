@@ -20,4 +20,14 @@ interface FeedInterface
      * @throws \Zend_Db_Statement_Exception
      */
     public function getFeedSince(string $timestamp): array;
+
+    /**
+     * Get feed data by IDs
+     *
+     * @param int[] $ids
+     * @param string[] $storeViewCodes
+     *
+     * @return array
+     */
+    public function getFeedByIds(array $ids, array $storeViewCodes = []): array;
 }

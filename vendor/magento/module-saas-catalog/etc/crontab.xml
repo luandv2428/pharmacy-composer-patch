@@ -7,9 +7,16 @@
 -->
 <!--@todo think of this settings before release-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
-    <group id="default">
-        <job name="submit_product_feed" instance="Magento\SaaSCatalog\Cron\SubmitProductFeed" method="execute">
+    <group id="catalog_data_exporter">
+        <job name="submit_product_feed" instance="Magento\SaaSCatalog\Cron\ProductSubmitFeed" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <job name="submit_product_metadata_feed" instance="Magento\SaaSCatalog\Cron\ProductMetadataSubmitFeed" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <!--TODO Catalog Ingestion service does not support categories yet -->
+        <!--<job name="submit_category_feed" instance="Magento\SaaSCatalog\Cron\CategorySubmitFeed" method="execute">-->
+            <!--<schedule>* * * * *</schedule>-->
+        <!--</job>-->
     </group>
 </config>

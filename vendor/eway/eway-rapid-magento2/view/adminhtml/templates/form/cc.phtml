@@ -1,0 +1,33 @@
+<?php
+// @codingStandardsIgnoreFile
+/**
+ * @var \Eway\EwayRapid\Block\Adminhtml\Js $block
+ */
+?>
+<script>
+    window.ewayRapidConfig = <?php echo $block->getJsConfig()?>;
+</script>
+<fieldset class="admin__fieldset payment-method" id="payment_form_ewayrapid"
+          style="display:none"
+          <?php /*
+                Must use data-mage-init instead of <script type="text/x-magento-init">
+                since the legacy-build.min.js in backend does not recognize this type of script and throw error
+             */ ?>
+          data-bind="scope:'paymentFormEwayrapid'"
+          data-mage-init='{"Magento_Ui/js/core/app": <?php echo $block->getJsLayout() ?> }'>
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</fieldset>
+<?php /* In case ajax loads payment block, need to run below code to init 'scope' binding to render above template again */ ?>
+<?php if ($block->getRequest()->getParam('isAjax')): ?>
+    <script>
+        require(
+            ['ko', 'jquery'],
+            function(ko, $) {
+            if ($('input[name="ewayrapid_create_from_admin"]').length == 0) {
+                var element = $('#payment_form_ewayrapid')[0];
+                ko.cleanNode(element);
+                ko.applyBindings(undefined, element);
+            }
+        });
+    </script>
+<?php endif; ?>

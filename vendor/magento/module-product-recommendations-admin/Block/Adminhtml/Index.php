@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Magento\ProductRecommendationsAdmin\Block\Adminhtml;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -66,6 +67,18 @@ class Index extends Template
     {
         $storeId = $this->getRequest()->getParam('store');
         return $this->_storeManager->getStore($storeId)->getCode();
+    }
+
+    /**
+     * Get website code
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getWebsiteCode(): string
+    {
+        $websiteId = $this->getRequest()->getParam('website');
+        return $this->_storeManager->getWebsite($websiteId)->getCode();
     }
 
     /**
@@ -138,5 +151,4 @@ class Index extends Template
     {
         return $this->_storeManager->getStore()->getBaseCurrencyCode();
     }
-
 }

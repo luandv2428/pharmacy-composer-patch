@@ -11,7 +11,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 
 /**
- * Class ProductAttributeQuery
+ * Product attribute query for catalog data exporter
  */
 class ProductAttributeQuery
 {
@@ -23,7 +23,12 @@ class ProductAttributeQuery
     /**
      * @var array
      */
-    private $attributeTypes = ['int', 'varchar', 'decimal', 'text'];
+    private $attributeTypes = ['int', 'varchar', 'decimal', 'text', 'datetime'];
+
+    /**
+     * @var string
+     */
+    private $mainTable;
 
     /**
      * MainProductQuery constructor.
@@ -101,7 +106,11 @@ class ProductAttributeQuery
         $productIds = isset($arguments['productId']) ? $arguments['productId'] : [];
         $storeViewCode = isset($arguments['storeViewCode']) ? $arguments['storeViewCode'] : [];
         $connection = $this->resourceConnection->getConnection();
-        $joinField = $connection->getAutoIncrementField($this->mainTable);
+        $joinField = $connection->getAutoIncrementField($this->getTable($this->mainTable));
+
+        $userDefinedAttributeIds = $this->getUserDefinedAttributeIds();
+
+        $selects = [];
         foreach ($this->attributeTypes as $type) {
             $selects[$type] = $connection->select()
                 ->from(['cpe' => $this->getTable($this->mainTable)], [])
@@ -115,7 +124,7 @@ class ProductAttributeQuery
                     sprintf(
                         'cpa.%1$s = cpe.%1$s AND cpa.attribute_id IN (%2$s) AND cpa.store_id = s.store_id',
                         $joinField,
-                        implode(',', $this->getUserDefinedAttributeIds())
+                        implode(',', $userDefinedAttributeIds)
                     ),
                     []
                 )
@@ -130,6 +139,7 @@ class ProductAttributeQuery
                         'sku' => 'cpe.sku',
                         'storeViewCode' => 's.code',
                         'attributeCode' => 'a.attribute_code',
+                        'frontendInput' => 'a.frontend_input',
                         'value' => 'cpa.value'
                     ]
                 )

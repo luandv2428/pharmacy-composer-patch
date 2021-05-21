@@ -18,13 +18,11 @@
     }
   },
   "require": {
-    "php": ">=7.1.3 <7.5.0",
-    "guzzlehttp/guzzle": ">=6.0",
+    "php": "~7.2.0||~7.3.0||~7.4.0",
+    "guzzlehttp/guzzle": "*",
     "guzzlehttp/psr7": "~1.0",
     "magento/framework": ">=101.0.4",
-    "magento/module-config": ">=100.2.3",
-    "magento/services-connector": "*",
-    "magento/module-services-id": "~2.0"
+    "magento/module-config": ">=100.2.3"
   },
-  "version": "42.2.3"
+  "version": "42.4.2"
 }

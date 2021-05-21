@@ -12,7 +12,9 @@
 <script type="text/x-magento-init">
     {
         "*": {
-            "dataServicesDiscount": {}
+            "dataServicesDiscount": {
+                "isEnabled": <?= (int) $block->isEnabled() ?>
+            }
         }
     }
 </script>

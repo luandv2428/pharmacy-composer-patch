@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- ###############################################################################################-->
+    <!-- ################                        IFRAME                                 ################-->
+    <!-- ###############################################################################################-->
+    <virtualType name="EwayRapidIFrameFormBlock" type="\Eway\EwayRapid\Block\Adminhtml\Cc">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="paymentFormEwayrapid" xsi:type="array">
+                            <item name="component" xsi:type="string">Eway_IFrame/js/view/payment/iframe</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Always use RESPONSIVE_SHARED ApiMethod in admin since Transparent Redirect will fallback to IFrame -->
+    <type name="\Eway\IFrame\Gateway\Request\AccessCodeBuilderComposite">
+        <arguments>
+            <argument name="method" xsi:type="const">\Eway\Rapid\Enum\ApiMethod::RESPONSIVE_SHARED</argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,91 @@
+<div class="payment-method" data-bind="css: {'_active': isActive() && scriptLoaded()}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- ko if: isTokenEnabled() -->
+        <select class="token-list"
+                data-bind=" options:        tokenList,
+                            optionsText:    'card',
+                            value:          selectedToken,
+                            optionsCaption: 'Use a new card',
+                            visible:        tokenList().length > 0"></select>
+
+            <!-- ko if: canEditToken() -->
+                <button type="button" title="Edit saved card" class="action primary"
+                        data-bind="visible: !isEditing(), click: editToken"><span>Edit</span></button>
+
+                <button type="button" title="Cancel" class="action cancel"
+                        data-bind="visible: isEditing(), click: cancelEditToken"><span>Cancel Edit</span></button>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <div data-bind="visible: showFullCard">
+            <div class="securefields-title">Card Name:</div><div id="eway-secure-field-name" class="securefields-wrapper"></div>
+            <div for="eway-secure-field-name" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-name-error">Invalid card name.</div>
+
+            <div data-bind="visible: !isEditing()">
+                <div class="securefields-title">Card Number:</div><div id="eway-secure-field-card" class="securefields-wrapper"></div>
+                <div for="eway-secure-field-card" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-card-error">Invalid card number.</div>
+            </div>
+            <div data-bind="visible: isEditing()">
+                <div class="securefields-title">Card Number: <strong><span data-bind="text: getSelectedCardNumber()"></span></strong></div>
+                <div><span>(To use a new credit card number, please add another card)</span></div>
+            </div>
+
+            <div class="securefields-title">Card Expiry:</div><div id="eway-secure-field-expiry" class="securefields-wrapper"></div>
+            <div for="eway-secure-field-expiry" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-expiry-error">Invalid card expiry.</div>
+        </div>
+        <div class="securefields-title">Card CVN:</div><div id="eway-secure-field-cvn" class="securefields-wrapper"></div>
+        <div for="eway-secure-field-cvn" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-cvn-error">Invalid card cvn.</div>
+        <input type="hidden" id="secured_card_data" name="SecuredCardData" value="" />
+
+        <!-- ko if: isTokenEnabled() -->
+            <div class="save_card_checkbox" data-bind="visible: !selectedToken()">
+                <input type="checkbox" id="save_card" class="checkbox" data-bind="checked: saveCard"/>
+                <label for="save_card" class="label"><span data-bind="text: getSaveText()"></span></label>
+            </div>
+        <!-- /ko -->
+
+        <style>
+            @media screen and (min-width: 768px) {
+                .token-list, .securefields-wrapper {width: 50%;}
+            }
+            .securefields-wrapper {height: 2em;}
+            .securefields-title {margin-top: 15px;}
+            .save_card_checkbox {margin-top: 15px;}
+        </style>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Place Order')},
+                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        ">
+                    <span data-bind="text: $t('Place Order')"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

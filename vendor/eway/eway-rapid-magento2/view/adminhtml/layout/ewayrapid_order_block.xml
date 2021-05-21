@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="adminhtml.block.eway.order.container">
+            <block class="Magento\Backend\Block\Widget\Grid" name="adminhtml.block.eway.order.grid" as="grid">
+                <arguments>
+                    <argument name="id" xsi:type="string">ewayOrderGrid</argument>
+                    <argument name="dataSource" xsi:type="object">EwayOrderColectionJoinedOrderTable</argument>
+                    <argument name="default_sort" xsi:type="string">created_at</argument>
+                    <argument name="default_dir" xsi:type="string">DESC</argument>
+                    <argument name="save_parameters_in_session" xsi:type="string">1</argument>
+                </arguments>
+                <block class="Magento\Backend\Block\Widget\Grid\Massaction" name="adminhtml.block.eway.order.grid.massaction" as="grid.massaction">
+                    <arguments>
+                        <argument name="massaction_id_field" xsi:type="string">order_id</argument>
+                        <argument name="form_field_name" xsi:type="string">order_id</argument>
+                        <argument name="use_select_all" xsi:type="string">1</argument>
+                        <argument name="options" xsi:type="array">
+                            <item name="verify" xsi:type="array">
+                                <item name="label" xsi:type="string" translate="true">Verify eWAY Order</item>
+                                <item name="url" xsi:type="string">*/*/massVerify</item>
+                            </item>
+                        </argument>
+                        <argument name="no_filter_massaction_column" xsi:type="string">true</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Backend\Block\Widget\Grid\ColumnSet" name="adminhtml.block.tax.rule.columnSet" as="grid.columnSet">
+                    <arguments>
+                        <argument name="rowUrl" xsi:type="array">
+                            <item name="path" xsi:type="string">sales/order/view</item>
+                            <item name="extraParamsTemplate" xsi:type="array">
+                                <item name="order_id" xsi:type="string">getOrderId</item>
+                            </item>
+                        </argument>
+                    </arguments>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="increment_id">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Magento Order ID</argument>
+                            <argument name="index" xsi:type="string">increment_id</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="items_ordered">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Items Orders</argument>
+                            <argument name="sortable" xsi:type="string">0</argument>
+                            <argument name="index" xsi:type="string">items_ordered</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                            <argument name="nl_2br" xsi:type="string">1</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="created_at">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Purchased On</argument>
+                            <argument name="index" xsi:type="string">created_at</argument>
+                            <argument name="type" xsi:type="string">datetime</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="billing_name">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Billing Name</argument>
+                            <argument name="index" xsi:type="string">billing_name</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="transaction_id">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Transaction Id</argument>
+                            <argument name="index" xsi:type="string">transaction_id</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="beagle_score">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Beagle Score</argument>
+                            <argument name="index" xsi:type="string">beagle_score</argument>
+                            <argument name="type" xsi:type="string">number</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="fraud_action">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Fraud Action</argument>
+                            <argument name="index" xsi:type="string">fraud_action</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="transaction_captured">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Transaction Captured</argument>
+                            <argument name="index" xsi:type="string">transaction_captured</argument>
+                            <argument name="type" xsi:type="string">options</argument>
+                            <argument name="options" xsi:type="options" model="Magento\Config\Model\Config\Source\Yesno"/>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="fraud_messages">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Fraud Messages</argument>
+                            <argument name="index" xsi:type="string">fraud_messages</argument>
+                            <argument name="sortable" xsi:type="string">0</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                            <argument name="nl_2br" xsi:type="string">1</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="status">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Order Status</argument>
+                            <argument name="index" xsi:type="string">status</argument>
+                            <argument name="type" xsi:type="string">options</argument>
+                            <argument name="options" xsi:type="options" model="Magento\Sales\Ui\Component\Listing\Column\Status\Options"/>
+                        </arguments>
+                    </block>
+                </block>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

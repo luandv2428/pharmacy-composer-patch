@@ -1,0 +1,25 @@
+{
+  "name": "eway/eway-rapid-iframe",
+  "description": "Provide IFrame method for eWAY Rapid Payment Module for Magento 2",
+  "homepage": "https://www.eway.com.au",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "eWAY",
+      "homepage": "https://www.eway.com.au"
+    }
+  ],
+  "require": {
+    "eway/eway-rapid-shared-page": "2.0.*"
+  },
+  "type": "magento2-module",
+  "version": "2.0.1",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Eway\\IFrame\\": ""
+    }
+  }
+}

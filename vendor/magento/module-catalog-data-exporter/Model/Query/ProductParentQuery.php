@@ -11,7 +11,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 
 /**
- * Class ProductPriceQuery
+ * Product parent query for catalog data exporter
  */
 class ProductParentQuery
 {
@@ -52,7 +52,7 @@ class ProductParentQuery
     {
         $productIds = isset($arguments['productId']) ? $arguments['productId'] : [];
         $connection = $this->resourceConnection->getConnection();
-        $joinField = $connection->getAutoIncrementField('catalog_product_entity');
+        $joinField = $connection->getAutoIncrementField($this->getTable('catalog_product_entity'));
 
         $select = $connection->select()
             ->from(['cpsl' => $this->getTable('catalog_product_super_link')])

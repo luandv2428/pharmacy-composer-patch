@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <ewayrapid>
+                <model>EwayRapidMethodAdapter</model>
+                <active>0</active>
+                <title>Credit Card - eWAY</title>
+                <payment_action>authorize_capture</payment_action>
+                <connection_type>securefields</connection_type>
+
+                <mode>sandbox</mode>
+                <sandbox_endpoint>https://api.sandbox.ewaypayments.com/</sandbox_endpoint>
+                <live_endpoint>https://api.ewaypayments.com/</live_endpoint>
+                <live_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <live_api_password backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_api_password backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+
+                <token_enabled>1</token_enabled>
+                <save_text><![CDATA[Save my details]]></save_text>
+                <save_card_checked>1</save_card_checked>
+                <can_edit_token>1</can_edit_token>
+
+                <block_fraud_customers>0</block_fraud_customers>
+                <useccv>1</useccv>
+                <cctypes>AE,VI,MC,JCB,DN</cctypes>
+                <allowspecific>0</allowspecific>
+                <order_status>eway_captured</order_status>
+                <transfer_cart_items>1</transfer_cart_items>
+                <invoice_reference>1</invoice_reference>
+                <invoice_description>1</invoice_description>
+                <debug>0</debug>
+
+                <can_initialize>0</can_initialize>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_internal>1</can_use_internal>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+            </ewayrapid>
+        </payment>
+    </default>
+</config>

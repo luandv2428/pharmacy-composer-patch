@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="ewayrapid">
+                <field id="live_encryption_key" translate="label" type="textarea" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Live Client-side Encryption Key</label>
+                    <depends>
+                        <field id="connection_type">direct</field>
+                        <field id="mode">live</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-set-up-Client-Side-Encryption" target="_blank">How do I set up Client Side Encryption</a>]]>
+                    </comment>
+                </field>
+                <field id="sandbox_encryption_key" translate="label" type="textarea" sortOrder="280" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox Client-side Encryption Key</label>
+                    <depends>
+                        <field id="connection_type">direct</field>
+                        <field id="mode">sandbox</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-set-up-Client-Side-Encryption" target="_blank">How do I set up Client Side Encryption</a>]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

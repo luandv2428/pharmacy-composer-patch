@@ -44,11 +44,6 @@ class ServiceClient implements ServiceClientInterface
     private $keyValidator;
 
     /**
-     * @var ServicesConfigInterface
-     */
-    private $servicesConfig;
-
-    /**
      * @var ScopeConfigInterface
      */
     private $config;
@@ -66,7 +61,6 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @param ClientResolverInterface $clientResolver
      * @param KeyValidationInterface $keyValidator
-     * @param ServicesConfigInterface $servicesConfig
      * @param ScopeConfigInterface $config
      * @param Json $serializer
      * @param LoggerInterface $logger
@@ -74,14 +68,12 @@ class ServiceClient implements ServiceClientInterface
     public function __construct(
         ClientResolverInterface $clientResolver,
         KeyValidationInterface $keyValidator,
-        ServicesConfigInterface $servicesConfig,
         ScopeConfigInterface $config,
         Json $serializer,
         LoggerInterface $logger
     ) {
         $this->clientResolver = $clientResolver;
         $this->keyValidator = $keyValidator;
-        $this->servicesConfig = $servicesConfig;
         $this->config = $config;
         $this->serializer = $serializer;
         $this->logger = $logger;
@@ -138,11 +130,10 @@ class ServiceClient implements ServiceClientInterface
     /**
      * @inheritDoc
      */
-    public function getUrl(string $version, string $uri, string $storeViewCode) : string
+    public function getUrl(string $version, string $uri) : string
     {
-        $environmentId = $this->servicesConfig->getEnvironmentId();
         $route = $this->config->getValue(self::ROUTE_CONFIG_PATH);
-        $url = sprintf('/%s/%s/%s/%s/%s', $route, $version, $environmentId, $storeViewCode, $uri);
+        $url = sprintf('/%s/%s/%s', $route, $version, $uri);
         return $url;
     }
 

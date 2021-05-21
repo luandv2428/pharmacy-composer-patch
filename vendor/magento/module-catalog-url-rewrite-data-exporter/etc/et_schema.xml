@@ -15,4 +15,12 @@
 
         </field>
     </record>
+    <record name="Category">
+        <field name="canonicalUrl" type="String"
+               provider="Magento\CatalogUrlRewriteDataExporter\Model\Provider\Category\CanonicalUrl"
+        >
+            <using field="categoryId" />
+            <using field="storeViewCode" />
+        </field>
+    </record>
 </config>

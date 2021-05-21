@@ -1,0 +1,14 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+$refundJson = $block->getRefundJson();
+if ($refundJson !== null) : ?>
+    <script>
+        dataLayer.push(<?= /* @noEscape */ $refundJson ?>);
+    </script>
+    <?php
+endif;

@@ -12,7 +12,7 @@ use Magento\Framework\DB\Select;
 use Magento\Framework\DB\Sql\ColumnValueExpression;
 
 /**
- * Class ProductPriceQuery
+ * Product category query for catalog data exporter
  */
 class ProductCategoryQuery
 {
@@ -20,6 +20,11 @@ class ProductCategoryQuery
      * @var ResourceConnection
      */
     private $resourceConnection;
+
+    /**
+     * @var string
+     */
+    private $mainTable;
 
     /**
      * MainProductQuery constructor.
@@ -113,7 +118,7 @@ class ProductCategoryQuery
             );
 
         $attributeId = $this->getUrlKeyAttributeId();
-        $joinField = $connection->getAutoIncrementField($this->mainTable);
+        $joinField = $connection->getAutoIncrementField($this->getTable($this->mainTable));
         $defaultValueTableAlias = 'url_key_default';
         $storeValueTableAlias = 'url_key_store';
         $defaultValueJoinCondition = sprintf(

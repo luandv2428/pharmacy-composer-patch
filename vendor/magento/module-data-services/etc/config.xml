@@ -8,7 +8,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <dataservices>
-            <version>5.0.2</version>
+            <version>6.1.0</version>
         </dataservices>
     </default>
 </config>

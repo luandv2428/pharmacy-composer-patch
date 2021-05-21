@@ -6,11 +6,104 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Magento\SaaSCatalog\Model\FeedRegistry">
+    <preference for="Magento\SaaSCatalog\Model\Http\ConverterInterface" type="Magento\SaaSCatalog\Model\Http\Converter\JsonConverter" />
+    <virtualType name="Magento\SaaSCatalog\Model\ProductFeedRegistry" type="Magento\SaaSCatalog\Model\FeedRegistry">
         <arguments>
             <argument name="excludeFields" xsi:type="array">
                 <item name="modifiedAt" xsi:type="string">modifiedAt</item>
                 <item name="updatedAt" xsi:type="string">updatedAt</item>
+            </argument>
+            <argument name="uniqueFields" xsi:type="array">
+                <item name="productId" xsi:type="string">productId</item>
+                <item name="storeViewCode" xsi:type="string">storeViewCode</item>
+            </argument>
+            <argument name="registryTable" xsi:type="string">catalog_product_data_submitted_hash</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Cron\ProductSubmitFeed" type="Magento\SaaSCatalog\Cron\SubmitFeed">
+        <arguments>
+            <argument name="feedName" xsi:type="string">products</argument>
+            <argument name="feedSyncFlag" xsi:type="string">products-feed-version</argument>
+            <argument name="feedRegistry" xsi:type="object">Magento\SaaSCatalog\Model\ProductFeedRegistry</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Cron\ProductMetadataSubmitFeed" type="Magento\SaaSCatalog\Cron\SubmitFeed">
+        <arguments>
+            <argument name="feedName" xsi:type="string">productAttributes</argument>
+            <argument name="feedSyncFlag" xsi:type="string">product-attributes-feed-version</argument>
+            <argument name="feedRegistry" xsi:type="object">Magento\SaaSCatalog\Model\ProductMetadataFeedRegistry</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Model\ProductMetadataFeedRegistry" type="Magento\SaaSCatalog\Model\FeedRegistry">
+        <arguments>
+            <argument name="excludeFields" xsi:type="array">
+                <item name="modifiedAt" xsi:type="string">modifiedAt</item>
+                <item name="updatedAt" xsi:type="string">updatedAt</item>
+            </argument>
+            <argument name="uniqueFields" xsi:type="array">
+                <item name="id" xsi:type="string">id</item>
+                <item name="storeViewCode" xsi:type="string">storeViewCode</item>
+            </argument>
+            <argument name="registryTable" xsi:type="string">catalog_product_attribute_data_submitted_hash</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Model\CategoryFeedRegistry" type="Magento\SaaSCatalog\Model\FeedRegistry">
+        <arguments>
+            <argument name="excludeFields" xsi:type="array">
+                <item name="modifiedAt" xsi:type="string">modifiedAt</item>
+                <item name="updatedAt" xsi:type="string">updatedAt</item>
+            </argument>
+            <argument name="uniqueFields" xsi:type="array">
+                <item name="categoryId" xsi:type="string">categoryId</item>
+                <item name="storeViewCode" xsi:type="string">storeViewCode</item>
+            </argument>
+            <argument name="registryTable" xsi:type="string">catalog_category_data_submitted_hash</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Cron\CategorySubmitFeed" type="Magento\SaaSCatalog\Cron\SubmitFeed">
+        <arguments>
+            <argument name="feedName" xsi:type="string">categories</argument>
+            <argument name="feedSyncFlag" xsi:type="string">categories-feed-version</argument>
+            <argument name="feedRegistry" xsi:type="object">Magento\SaaSCatalog\Model\CategoryFeedRegistry</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Model\ProductResyncManager" type="Magento\SaaSCatalog\Model\ResyncManager">
+        <arguments>
+            <argument name="feedIndexer" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\ProductFeedIndexer</argument>
+            <argument name="submitFeed" xsi:type="object">Magento\SaaSCatalog\Cron\ProductSubmitFeed</argument>
+            <argument name="feedInterface" xsi:type="object">Magento\CatalogDataExporter\Model\Feed\Products</argument>
+            <argument name="flagName" xsi:type="string">products-feed-version</argument>
+            <argument name="indexerName" xsi:type="string">catalog_data_exporter_products</argument>
+            <argument name="registryTableName" xsi:type="string">catalog_product_data_submitted_hash</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\SaaSCatalog\Model\CategoryResyncManager" type="Magento\SaaSCatalog\Model\ResyncManager">
+        <arguments>
+            <argument name="feedIndexer" xsi:type="object">Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexer</argument>
+            <argument name="submitFeed" xsi:type="object">Magento\SaaSCatalog\Cron\CategorySubmitFeed</argument>
+            <argument name="feedInterface" xsi:type="object">Magento\CatalogDataExporter\Model\Feed\Categories</argument>
+            <argument name="flagName" xsi:type="string">categories-feed-version</argument>
+            <argument name="indexerName" xsi:type="string">catalog_data_exporter_categories</argument>
+            <argument name="registryTableName" xsi:type="string">catalog_category_data_submitted_hash</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\SaaSCatalog\Model\ResyncManagerPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="products" xsi:type="string">Magento\SaaSCatalog\Model\ProductResyncManager</item>
+                <item name="categories" xsi:type="string">Magento\SaaSCatalog\Model\CategoryResyncManager</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="dto_auto_generation" xsi:type="object">
+                    Magento\SaaSCatalog\Console\Command\GenerateDTOFiles
+                </item>
+                <item name="saascatalog_resync" xsi:type="object">
+                    Magento\SaaSCatalog\Console\Command\Resync
+                </item>
             </argument>
         </arguments>
     </type>

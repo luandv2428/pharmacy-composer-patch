@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- ###############################################################################################-->
+    <!-- ################                        DIRECT CONNECTION                      ################-->
+    <!-- ###############################################################################################-->
+    <virtualType name="EwayRapidDirectFormBlock" type="\Eway\EwayRapid\Block\Adminhtml\Cc">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="paymentFormEwayrapid" xsi:type="array">
+                            <item name="component" xsi:type="string">Eway_DirectConnection/js/view/payment/direct</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
+        <arguments>
+            <argument name="methodCodes" xsi:type="array">
+                <item name="ewayrapid" xsi:type="const">\Eway\EwayRapid\Model\Ui\ConfigProvider::CODE</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

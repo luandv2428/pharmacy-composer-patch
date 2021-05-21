@@ -1,0 +1,29 @@
+<style>
+    .securefields-wrapper {height: 2em;}
+</style>
+<div data-bind="afterRender: loadScript" class="fieldset">
+    <div class="field required">
+        <label class="label" for="eway-secure-field-name"> <span>Card Name</span> </label>
+        <div id="eway-secure-field-name" class="securefields-wrapper"></div>
+        <div for="eway-secure-field-name" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-name-error">Invalid card name.</div>
+    </div>
+
+    <div class="field required" data-bind="visible: !isEditing()">
+        <label class="label" for="eway-secure-field-card"> <span>Card Number</span> </label>
+        <div id="eway-secure-field-card" class="securefields-wrapper"></div>
+        <div for="eway-secure-field-card" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-card-error">Invalid card number.</div>
+    </div>
+    <div class="field" data-bind="visible: isEditing()">
+        <label class="label"> <span>Card Number</span> </label>
+        <div class="securefields-title"><strong> <span data-bind="text: getSelectedCardNumber()"></span></strong></div>
+        <div><span>(To use a new credit card number, please add another card)</span></div>
+    </div>
+
+    <div class="field required">
+        <label class="label" for="eway-secure-field-expiry"> <span>Card Expiry</span> </label>
+        <div id="eway-secure-field-expiry" class="securefields-wrapper"></div>
+        <div for="eway-secure-field-expiry" style="display: none;" generated="true" class="mage-error" id="eway-secure-field-expiry-error">Invalid card expiry.</div>
+    </div>
+
+    <input type="hidden" id="secured_card_data" name="SecuredCardData" value="" />
+</div>

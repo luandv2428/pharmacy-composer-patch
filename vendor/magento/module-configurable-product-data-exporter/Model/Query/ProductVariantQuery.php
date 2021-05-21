@@ -53,7 +53,7 @@ class ProductVariantQuery
         $productIds = isset($arguments['productId']) ? $arguments['productId'] : [];
         $storeViewCodes = isset($arguments['storeViewCode']) ? $arguments['storeViewCode'] : [];
         $connection = $this->resourceConnection->getConnection();
-        $joinField = $connection->getAutoIncrementField('catalog_product_entity');
+        $joinField = $connection->getAutoIncrementField($this->getTable('catalog_product_entity'));
 
         $select = $connection->select()
             ->from(['cpsl' => $this->getTable('catalog_product_super_link')], [])

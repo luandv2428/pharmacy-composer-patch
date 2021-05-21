@@ -1,0 +1,61 @@
+<?php /** @var \Eway\EwayRapid\Block\Adminhtml\Mycard $block */ ?>
+<div id="mycards_messages"></div>
+<div id="mycards_wrapper">
+    <?php /* @escapeNotVerified @noEscape */ echo $block->getChildHtml(); ?>
+</div>
+<script> <?php // @codingStandardsIgnoreLine ?>
+    require(['jquery'], function ($) {
+        var self = this;
+        $('#mycards_wrapper').on('click', 'a, button.add', function(event) {
+            event.preventDefault();
+            var ele = $(this);
+            if (ele.data('confirm') && !confirm(ele.data('confirm'))) {
+                return false;
+            }
+            $('body').trigger('processStart');
+            $.ajax({
+                method: 'GET',
+                url: ele.attr('href')
+            }).then(function(data) {
+                if (ele.data('action') == 'edit') {
+                    $('#mycards_messages').html('');
+                    self.updateContent(data);
+                } else {
+                    self.showListing(data.messages);
+                }
+            });
+        });
+
+        $('#mycards_wrapper').on('click', 'button.back', function(event) {
+            event.preventDefault();
+            $('body').trigger('processStart');
+            self.showListing('');
+        });
+
+        $('#mycards_wrapper').on('ajax-submit', '#mycard_edit_form', function() {
+            var form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                form_key: FORM_KEY,
+                data: form.serialize()
+            }).then(function (data) {
+                self.showListing(data.messages);
+            });
+        });
+
+
+        self.updateContent = function(content) {
+            $('#mycards_wrapper').html(content);
+            $('body').trigger('processStop');
+        };
+
+        self.showListing = function(message) {
+            $('#mycards_messages').html(message);
+            $.ajax({
+                method: 'GET',
+                url: '<?php /* @escapeNotVerified @noEscape */ echo $block->getListingAjaxUrl() ?>'
+            }).done(self.updateContent);
+        };
+    });
+</script>

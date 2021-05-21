@@ -1,0 +1,26 @@
+{
+    "name": "magento/module-product-recommendations-sync-admin",
+    "description": "Product Recommendations sync status interface",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~7.2.0||~7.3.0||~7.4.0",
+        "guzzlehttp/guzzle": "~6.0",
+        "guzzlehttp/psr7": "~1.0",
+        "magento/framework": ">=102.0.0 <104.0.0",
+        "magento/module-backend": ">=101.0.0 <103.0.0",
+        "magento/module-catalog-sync-admin": "~1.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magento\\ProductRecommendationsSyncAdmin\\": ""
+        }
+    },
+    "version": "1.0.0"
+}

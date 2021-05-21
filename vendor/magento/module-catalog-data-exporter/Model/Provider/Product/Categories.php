@@ -13,7 +13,7 @@ use Magento\DataExporter\Exception\UnableRetrieveData;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class Categories
+ * Product categories data provider
  */
 class Categories
 {
@@ -33,8 +33,6 @@ class Categories
     private $logger;
 
     /**
-     * MainEntity constructor.
-     *
      * @param ResourceConnection $resourceConnection
      * @param ProductCategoryQuery $productCategoryQuery
      * @param LoggerInterface $logger
@@ -69,7 +67,7 @@ class Categories
             $result = $connection->fetchAll($this->productCategoryQuery->getQuery($queryArguments));
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
-            throw new UnableRetrieveData(__('Unable to retrieve categories data'));
+            throw new UnableRetrieveData('Unable to retrieve categories data');
         }
         return $result;
     }

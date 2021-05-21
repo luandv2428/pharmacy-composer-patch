@@ -7,14 +7,14 @@
     "AFL-3.0"
   ],
   "require": {
-    "php": ">=7.1.3 <7.5.0",
+    "php": "~7.2.0||~7.3.0||~7.4.0",
     "guzzlehttp/guzzle": "~6.0",
     "guzzlehttp/psr7": "~1.0",
     "magento/framework": ">=102.0.0 <104.0.0",
     "magento/module-backend": ">=101.0.0 <103.0.0",
     "magento/module-catalog": ">=103.0.0 <105.0.0",
     "magento/module-store": ">=101.0.0 <101.2.0",
-    "magento/module-services-id": "~2.0"
+    "magento/module-services-id": "~2.1"
   },
   "autoload": {
     "files": [
@@ -24,5 +24,5 @@
       "Magento\\ProductRecommendationsAdmin\\": ""
     }
   },
-  "version": "2.0.3"
+  "version": "3.0.0"
 }

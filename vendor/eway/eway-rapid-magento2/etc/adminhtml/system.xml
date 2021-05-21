@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="ewayrapid" translate="label" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>eWAY Rapid 3.1</label>
+
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable this solution</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="heading_basic_settings" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Basic Settings</label>
+                    <frontend_model>\Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Title</label>
+                </field>
+                <field id="connection_type" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Connection Type</label>
+                    <source_model>\Eway\EwayRapid\Model\Config\Source\ConnectionType</source_model>
+                </field>
+                <field id="payment_action" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Payment Action</label>
+                    <source_model>\Eway\EwayRapid\Model\Config\Source\PaymentAction</source_model>
+                </field>
+
+                <field id="heading_mode" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>
+                        <![CDATA[
+                            eWAY Rapid 3.1 Mode
+                            <p style="font-size: 1.2rem">
+                                All below credentials are required for this payment method to be active
+                            </p>
+                        ]]>
+                    </label>
+                    <frontend_model>\Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="mode" type="select" translate="label" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Mode</label>
+                    <source_model>\Eway\EwayRapid\Model\Config\Source\Mode</source_model>
+                </field>
+                <field id="live_api_key" translate="label" type="obscure" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Live API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="mode">live</field>
+                    </depends>
+                </field>
+                <field id="live_api_password" translate="label" type="obscure" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Live API Password</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="mode">live</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-setup-my-Live-eWAY-API-Key-and-Password" target="_blank">How to generate Live Rapid 3.1 API Key and Password</a>]]>
+                    </comment>
+                </field>
+                <field id="sandbox_api_key" translate="label" type="obscure" sortOrder="260" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="mode">sandbox</field>
+                    </depends>
+                </field>
+                <field id="sandbox_api_password" translate="label" type="obscure" sortOrder="270" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sandbox API Password</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="mode">sandbox</field>
+                    </depends>
+                    <comment>
+                        <![CDATA[<a href="https://go.eway.io/s/article/How-do-I-set-up-my-Sandbox-API-Key-and-password" target="_blank">How to generate Sandbox Rapid 3.1 API Key and Password</a>]]>
+                    </comment>
+                </field>
+
+                <field id="heading_token_settings" translate="label" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Token Payment Settings</label>
+                    <frontend_model>\Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="token_enabled" type="select" translate="label" sortOrder="310" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Enable Token Payment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="save_text" type="text" translate="label" sortOrder="320" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Save Card Label</label>
+                    <depends>
+                        <field id="token_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="save_card_checked" type="select" translate="label" sortOrder="330" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Default Check</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="token_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="can_edit_token" type="select" translate="label" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Customer can edit token</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="token_enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="heading_advanced_settings" translate="label" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Advanced Settings</label>
+                    <frontend_model>\Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="block_fraud_customers" type="select" translate="label" sortOrder="550" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Block Suspected Fraud Customers</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[If enabled, customers who place a Suspected Fraud order will be blocked from placing a new order
+                        until the earlier order is accepted or unblocked by admin.]]>
+                    </comment>
+                </field>
+                <field id="useccv" type="select" translate="label" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Require CVN</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[eWAY strongly recommends enabling CVN to help prevent fraud. Many banks require it.]]>
+                    </comment>
+                </field>
+                <field id="cctypes" type="multiselect" translate="label" sortOrder="700" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Accepted Credit Cards</label>
+                    <source_model>\Eway\EwayRapid\Model\Config\Source\Cctype</source_model>
+                    <comment>
+                        <![CDATA[Visa Electron and Maestro are accepted in the UK only.]]>
+                    </comment>
+                </field>
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="900" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+                <field id="order_status" type="select" translate="label" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>New Order Status</label>
+                    <source_model>\Eway\EwayRapid\Model\Config\Source\OrderStatus</source_model>
+                    <backend_model>\Eway\EwayRapid\Model\Config\Backend\OrderStatus</backend_model>
+                    <comment>
+                        <![CDATA[If you have changed Payment Action, please save the config before updating this field.]]>
+                    </comment>
+                </field>
+                <field id="transfer_cart_items" type="select" translate="label" sortOrder="1100" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Transfer Cart Line Items</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Used by Beagle Fraud Alerts (Enterprise) to calculate a risk score.]]>
+                    </comment>
+                </field>
+                <field id="invoice_reference" type="select" translate="label" sortOrder="1110" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Invoice Reference</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Send order id as Invoice Reference.]]>
+                    </comment>
+                </field>
+                <field id="invoice_description" type="select" translate="label" sortOrder="1120" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Invoice Description</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Send order items as Invoice Description.]]>
+                    </comment>
+                </field>
+
+                <field id="debug" type="select" translate="label" sortOrder="1200" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="1300" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

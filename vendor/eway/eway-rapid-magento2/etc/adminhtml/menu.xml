@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Eway_EwayRapid::view_orders"
+             title="eWAY Orders"
+             translate="title"
+             module="Eway_EwayRapid"
+             sortOrder="15"
+             parent="Magento_Sales::sales_operation"
+             action="ewayrapid/order"
+             resource="Eway_EwayRapid::eway_orders"
+             dependsOnConfig="payment/ewayrapid/active"/>
+    </menu>
+</config>
